@@ -9,6 +9,7 @@ except ImportError:
     MPI = None
 
 import gym
+import SafetyGuided_DRL.envs
 import os.path as osp
 from gym.wrappers import FlattenDictWrapper
 from baselines import logger

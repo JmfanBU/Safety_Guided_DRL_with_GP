@@ -1,4 +1,5 @@
 import sys
+import os
 import re
 import multiprocessing
 import os.path as osp
@@ -6,6 +7,7 @@ import gym
 from collections import defaultdict
 import tensorflow as tf
 import numpy as np
+import joblib
 
 from baselines.common.vec_env import VecFrameStack, VecNormalize, VecEnv
 from baselines.common.vec_env.vec_video_recorder import VecVideoRecorder
@@ -29,6 +31,8 @@ try:
 except ImportError:
     roboschool = None
 
+output_interval = 10
+
 _game_envs = defaultdict(set)
 for env in gym.envs.registry.all():
     # TODO: solve this with regexes
@@ -48,6 +52,42 @@ _game_envs['retro'] = {
     'FinalFight-Snes',
     'SpaceInvaders-Snes',
 }
+
+
+def callback(localv, globalv, guard=False):
+    # Create or check params directory
+    if not osp.exists(logger.get_dir() + '/params'):
+        os.mkdir(logger.get_dir() + '/params')
+
+    save_dict = {}
+
+    # Actor params
+    actor_variables = localv['actor'].vars
+    for i in range(len(actor_variables)):
+        cur_val = actor_variables[i].eval()
+        save_dict[actor_variables[i].name] = cur_val
+    joblib.dump(save_dict, logger.get_dir() + '/params/actor_params' + '.pkl', compress=True)
+
+    # Critic params
+    critic_variables = localv['critic'].vars
+    for i in range(len(critic_variables)):
+        cur_val = critic_variables[i].eval()
+        save_dict[critic_variables[i].name] = cur_val
+    joblib.dump(save_dict, logger.get_dir() + '/params/critic_params' + '.pkl', compress=True)
+
+    # Guard params
+    if guard:
+        guard_variables = localv['guard'].vars
+        for i in range(len(guard_variables)):
+            cur_val = guard_variables[i].eval()
+            save_dict[guard_variables[i].name] = cur_val
+        joblib.dump(save_dict, logger.get_dir() + '/params/guard_params' + '.pkl', compress=True)
+
+    # Store actor params every 10 epochs
+    if localv['cycle'] % output_interval != 0:
+        return
+    joblib.dump(save_dict, logger.get_dir()+'/params/actor_params_'+str(localv['epoch'])+'.pkl', compress=True)
+
 
 
 def train(args, extra_args):
@@ -75,6 +115,7 @@ def train(args, extra_args):
         env=env,
         seed=seed,
         total_timesteps=total_timesteps,
+        callback=callback,
         **alg_kwargs
     )
 

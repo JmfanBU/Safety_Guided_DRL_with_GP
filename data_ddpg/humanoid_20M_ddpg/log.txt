@@ -5,35 +5,28 @@ setting up param noise
   param_noise_actor/mlp_fc0/b:0 <- actor/mlp_fc0/b:0 + noise
   param_noise_actor/mlp_fc1/w:0 <- actor/mlp_fc1/w:0 + noise
   param_noise_actor/mlp_fc1/b:0 <- actor/mlp_fc1/b:0 + noise
-  param_noise_actor/mlp_fc2/w:0 <- actor/mlp_fc2/w:0 + noise
-  param_noise_actor/mlp_fc2/b:0 <- actor/mlp_fc2/b:0 + noise
   param_noise_actor/dense/kernel:0 <- actor/dense/kernel:0 + noise
   param_noise_actor/dense/bias:0 <- actor/dense/bias:0 + noise
   adaptive_param_noise_actor/mlp_fc0/w:0 <- actor/mlp_fc0/w:0 + noise
   adaptive_param_noise_actor/mlp_fc0/b:0 <- actor/mlp_fc0/b:0 + noise
   adaptive_param_noise_actor/mlp_fc1/w:0 <- actor/mlp_fc1/w:0 + noise
   adaptive_param_noise_actor/mlp_fc1/b:0 <- actor/mlp_fc1/b:0 + noise
-  adaptive_param_noise_actor/mlp_fc2/w:0 <- actor/mlp_fc2/w:0 + noise
-  adaptive_param_noise_actor/mlp_fc2/b:0 <- actor/mlp_fc2/b:0 + noise
   adaptive_param_noise_actor/dense/kernel:0 <- actor/dense/kernel:0 + noise
   adaptive_param_noise_actor/dense/bias:0 <- actor/dense/bias:0 + noise
 setting up actor optimizer
-  actor shapes: [[376, 128], [128], [128, 128], [128], [128, 128], [128], [128, 17], [17]]
-  actor params: 83473
+  actor shapes: [[376, 400], [400], [400, 400], [400], [400, 17], [17]]
+  actor params: 318017
 setting up critic optimizer
   regularizing: critic/mlp_fc0/w:0
   regularizing: critic/mlp_fc1/w:0
-  regularizing: critic/mlp_fc2/w:0
   applying l2 regularization with 0.01
-  critic shapes: [[393, 128], [128], [128, 128], [128], [128, 128], [128], [128, 1], [1]]
-  critic params: 83585
+  critic shapes: [[393, 400], [400], [400, 400], [400], [400, 1], [1]]
+  critic params: 318401
 setting up target updates ...
   target_actor/mlp_fc0/w:0 <- actor/mlp_fc0/w:0
   target_actor/mlp_fc0/b:0 <- actor/mlp_fc0/b:0
   target_actor/mlp_fc1/w:0 <- actor/mlp_fc1/w:0
   target_actor/mlp_fc1/b:0 <- actor/mlp_fc1/b:0
-  target_actor/mlp_fc2/w:0 <- actor/mlp_fc2/w:0
-  target_actor/mlp_fc2/b:0 <- actor/mlp_fc2/b:0
   target_actor/dense/kernel:0 <- actor/dense/kernel:0
   target_actor/dense/bias:0 <- actor/dense/bias:0
 setting up target updates ...
@@ -41,71 +34,38 @@ setting up target updates ...
   target_critic/mlp_fc0/b:0 <- critic/mlp_fc0/b:0
   target_critic/mlp_fc1/w:0 <- critic/mlp_fc1/w:0
   target_critic/mlp_fc1/b:0 <- critic/mlp_fc1/b:0
-  target_critic/mlp_fc2/w:0 <- critic/mlp_fc2/w:0
-  target_critic/mlp_fc2/b:0 <- critic/mlp_fc2/b:0
   target_critic/output/kernel:0 <- critic/output/kernel:0
   target_critic/output/bias:0 <- critic/output/bias:0
 Using agent with the following configuration:
-dict_items([('obs0', <tf.Tensor 'obs0:0' shape=(?, 376) dtype=float32>), ('obs1', <tf.Tensor 'obs1:0' shape=(?, 376) dtype=float32>), ('terminals1', <tf.Tensor 'terminals1:0' shape=(?, 1) dtype=float32>), ('rewards', <tf.Tensor 'rewards:0' shape=(?, 1) dtype=float32>), ('actions', <tf.Tensor 'actions:0' shape=(?, 17) dtype=float32>), ('critic_target', <tf.Tensor 'critic_target:0' shape=(?, 1) dtype=float32>), ('param_noise_stddev', <tf.Tensor 'param_noise_stddev:0' shape=() dtype=float32>), ('gamma', 0.99), ('tau', 0.01), ('memory', <baselines.ddpg.memory.Memory object at 0x7f214d3602b0>), ('normalize_observations', True), ('normalize_returns', False), ('action_noise', None), ('param_noise', AdaptiveParamNoiseSpec(initial_stddev=0.2, desired_action_stddev=0.2, adoption_coefficient=1.01)), ('action_range', (-1.0, 1.0)), ('return_range', (-inf, inf)), ('observation_range', (-5.0, 5.0)), ('critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f21eb1826a0>), ('actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f21eb1826d8>), ('actor_lr', 0.0001), ('critic_lr', 0.001), ('clip_norm', None), ('enable_popart', False), ('reward_scale', 1.0), ('batch_size', 64), ('stats_sample', None), ('critic_l2_reg', 0.01), ('obs_rms', <baselines.common.mpi_running_mean_std.RunningMeanStd object at 0x7f21eb199160>), ('ret_rms', None), ('target_actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f21eb182a20>), ('target_critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f21eb182e80>), ('actor_tf', <tf.Tensor 'actor/Tanh:0' shape=(?, 17) dtype=float32>), ('normalized_critic_tf', <tf.Tensor 'critic/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_tf', <tf.Tensor 'clip_by_value_2:0' shape=(?, 1) dtype=float32>), ('normalized_critic_with_actor_tf', <tf.Tensor 'critic_1/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_with_actor_tf', <tf.Tensor 'clip_by_value_3:0' shape=(?, 1) dtype=float32>), ('target_Q', <tf.Tensor 'add_2:0' shape=(?, 1) dtype=float32>), ('perturbed_actor_tf', <tf.Tensor 'param_noise_actor/Tanh:0' shape=(?, 17) dtype=float32>), ('perturb_policy_ops', <tf.Operation 'group_deps' type=NoOp>), ('perturb_adaptive_policy_ops', <tf.Operation 'group_deps_1' type=NoOp>), ('adaptive_policy_distance', <tf.Tensor 'Sqrt:0' shape=() dtype=float32>), ('actor_loss', <tf.Tensor 'Neg:0' shape=() dtype=float32>), ('actor_grads', <tf.Tensor 'concat:0' shape=(83473,) dtype=float32>), ('actor_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f2181a989b0>), ('critic_loss', <tf.Tensor 'add_19:0' shape=() dtype=float32>), ('critic_grads', <tf.Tensor 'concat_2:0' shape=(83585,) dtype=float32>), ('critic_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f2181aaa908>), ('stats_ops', [<tf.Tensor 'Mean_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_4:0' shape=() dtype=float32>, <tf.Tensor 'Mean_5:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_1:0' shape=() dtype=float32>, <tf.Tensor 'Mean_8:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_2:0' shape=() dtype=float32>, <tf.Tensor 'Mean_11:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_14:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_4:0' shape=() dtype=float32>]), ('stats_names', ['obs_rms_mean', 'obs_rms_std', 'reference_Q_mean', 'reference_Q_std', 'reference_actor_Q_mean', 'reference_actor_Q_std', 'reference_action_mean', 'reference_action_std', 'reference_perturbed_action_mean', 'reference_perturbed_action_std']), ('target_init_updates', [<tf.Operation 'group_deps_4' type=NoOp>, <tf.Operation 'group_deps_6' type=NoOp>]), ('target_soft_updates', [<tf.Operation 'group_deps_5' type=NoOp>, <tf.Operation 'group_deps_7' type=NoOp>]), ('initial_state', None)])
+dict_items([('obs0', <tf.Tensor 'obs0:0' shape=(?, 376) dtype=float32>), ('obs1', <tf.Tensor 'obs1:0' shape=(?, 376) dtype=float32>), ('terminals1', <tf.Tensor 'terminals1:0' shape=(?, 1) dtype=float32>), ('rewards', <tf.Tensor 'rewards:0' shape=(?, 1) dtype=float32>), ('actions', <tf.Tensor 'actions:0' shape=(?, 17) dtype=float32>), ('critic_target', <tf.Tensor 'critic_target:0' shape=(?, 1) dtype=float32>), ('param_noise_stddev', <tf.Tensor 'param_noise_stddev:0' shape=() dtype=float32>), ('gamma', 0.99), ('tau', 0.01), ('memory', <baselines.ddpg.memory.Memory object at 0x7f3c308f5400>), ('normalize_observations', True), ('normalize_returns', False), ('action_noise', None), ('param_noise', AdaptiveParamNoiseSpec(initial_stddev=0.2, desired_action_stddev=0.2, adoption_coefficient=1.01)), ('action_range', (-1.0, 1.0)), ('return_range', (-inf, inf)), ('observation_range', (-5.0, 5.0)), ('critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f3cce72f828>), ('actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f3cce72f860>), ('actor_lr', 0.0001), ('critic_lr', 0.001), ('clip_norm', None), ('enable_popart', False), ('reward_scale', 1.0), ('batch_size', 64), ('stats_sample', None), ('critic_l2_reg', 0.01), ('obs_rms', <baselines.common.mpi_running_mean_std.RunningMeanStd object at 0x7f3cce7472e8>), ('ret_rms', None), ('target_actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f3cce72f898>), ('target_critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f3cce72fa90>), ('actor_tf', <tf.Tensor 'actor/Tanh:0' shape=(?, 17) dtype=float32>), ('normalized_critic_tf', <tf.Tensor 'critic/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_tf', <tf.Tensor 'clip_by_value_2:0' shape=(?, 1) dtype=float32>), ('normalized_critic_with_actor_tf', <tf.Tensor 'critic_1/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_with_actor_tf', <tf.Tensor 'clip_by_value_3:0' shape=(?, 1) dtype=float32>), ('target_Q', <tf.Tensor 'add_2:0' shape=(?, 1) dtype=float32>), ('perturbed_actor_tf', <tf.Tensor 'param_noise_actor/Tanh:0' shape=(?, 17) dtype=float32>), ('perturb_policy_ops', <tf.Operation 'group_deps' type=NoOp>), ('perturb_adaptive_policy_ops', <tf.Operation 'group_deps_1' type=NoOp>), ('adaptive_policy_distance', <tf.Tensor 'Sqrt:0' shape=() dtype=float32>), ('actor_loss', <tf.Tensor 'Neg:0' shape=() dtype=float32>), ('actor_grads', <tf.Tensor 'concat:0' shape=(318017,) dtype=float32>), ('actor_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f3cc9827f28>), ('critic_loss', <tf.Tensor 'add_15:0' shape=() dtype=float32>), ('critic_grads', <tf.Tensor 'concat_2:0' shape=(318401,) dtype=float32>), ('critic_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f3cc9837320>), ('stats_ops', [<tf.Tensor 'Mean_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_4:0' shape=() dtype=float32>, <tf.Tensor 'Mean_5:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_1:0' shape=() dtype=float32>, <tf.Tensor 'Mean_8:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_2:0' shape=() dtype=float32>, <tf.Tensor 'Mean_11:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_14:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_4:0' shape=() dtype=float32>]), ('stats_names', ['obs_rms_mean', 'obs_rms_std', 'reference_Q_mean', 'reference_Q_std', 'reference_actor_Q_mean', 'reference_actor_Q_std', 'reference_action_mean', 'reference_action_std', 'reference_perturbed_action_mean', 'reference_perturbed_action_std']), ('target_init_updates', [<tf.Operation 'group_deps_4' type=NoOp>, <tf.Operation 'group_deps_6' type=NoOp>]), ('target_soft_updates', [<tf.Operation 'group_deps_5' type=NoOp>, <tf.Operation 'group_deps_7' type=NoOp>]), ('initial_state', None)])
 ---------------------------------------------
 | obs_rms_mean                   | 0        |
 | obs_rms_std                    | 1        |
 | param_noise_stddev             | 0.164    |
-| reference_action_mean          | 0.0702   |
-| reference_action_std           | 0.987    |
-| reference_actor_Q_mean         | 44.4     |
-| reference_actor_Q_std          | 14.5     |
-| reference_perturbed_action_... | 0.0253   |
-| reference_perturbed_action_std | 0.99     |
-| reference_Q_mean               | 43       |
-| reference_Q_std                | 14.4     |
-| rollout/actions_mean           | 0.0772   |
-| rollout/actions_std            | 0.989    |
-| rollout/episode_steps          | 27.5     |
-| rollout/episodes               | 724      |
-| rollout/Q_mean                 | 23.2     |
-| rollout/return                 | 146      |
-| rollout/return_history         | 160      |
-| rollout/return_history_std     | 118      |
-| rollout/return_std             | 110      |
-| total/duration                 | 64.1     |
-| total/episodes                 | 724      |
+| reference_action_mean          | 0.529    |
+| reference_action_std           | 0.848    |
+| reference_actor_Q_mean         | 39.2     |
+| reference_actor_Q_std          | 10.8     |
+| reference_perturbed_action_... | 0.169    |
+| reference_perturbed_action_std | 0.981    |
+| reference_Q_mean               | 38       |
+| reference_Q_std                | 11       |
+| rollout/actions_mean           | 0.00907  |
+| rollout/actions_std            | 0.993    |
+| rollout/episode_steps          | 22.3     |
+| rollout/episodes               | 896      |
+| rollout/Q_mean                 | 20.2     |
+| rollout/return                 | 107      |
+| rollout/return_history         | 129      |
+| rollout/return_history_std     | 83.9     |
+| rollout/return_std             | 57.1     |
+| total/duration                 | 59.7     |
+| total/episodes                 | 896      |
 | total/epochs                   | 1        |
 | total/steps                    | 2e+04    |
-| total/steps_per_second         | 312      |
-| train/loss_actor               | -44.2    |
-| train/loss_critic              | 41.4     |
-| train/param_noise_distance     | 1.01     |
----------------------------------------------
-
----------------------------------------------
-| obs_rms_mean                   | 0        |
-| obs_rms_std                    | 1        |
-| param_noise_stddev             | 0.134    |
-| reference_action_mean          | 0.426    |
-| reference_action_std           | 0.875    |
-| reference_actor_Q_mean         | 83.7     |
-| reference_actor_Q_std          | 32.8     |
-| reference_perturbed_action_... | 0.248    |
-| reference_perturbed_action_std | 0.958    |
-| reference_Q_mean               | 80.5     |
-| reference_Q_std                | 33.8     |
-| rollout/actions_mean           | 0.123    |
-| rollout/actions_std            | 0.982    |
-| rollout/episode_steps          | 31       |
-| rollout/episodes               | 1.29e+03 |
-| rollout/Q_mean                 | 47.8     |
-| rollout/return                 | 172      |
-| rollout/return_history         | 247      |
-| rollout/return_history_std     | 150      |
-| rollout/return_std             | 127      |
-| total/duration                 | 129      |
-| total/episodes                 | 1.29e+03 |
-| total/epochs                   | 2        |
-| total/steps                    | 4e+04    |
-| total/steps_per_second         | 310      |
-| train/loss_actor               | -90.9    |
-| train/loss_critic              | 87.9     |
-| train/param_noise_distance     | 1.14     |
+| total/steps_per_second         | 335      |
+| train/loss_actor               | -37.7    |
+| train/loss_critic              | 19.3     |
+| train/param_noise_distance     | 1.41     |
 ---------------------------------------------
 
