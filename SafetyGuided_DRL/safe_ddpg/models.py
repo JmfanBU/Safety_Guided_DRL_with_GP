@@ -50,6 +50,7 @@ class Critic(Model):
         output_vars = [var for var in self.trainable_vars if 'output' in var.name]
         return output_vars
 
+
 class Guard(Model):
     def __init__(self, name='guard', network='mlp', **network_kwargs):
         super().__init__(name=name, network=network, **network_kwargs)
