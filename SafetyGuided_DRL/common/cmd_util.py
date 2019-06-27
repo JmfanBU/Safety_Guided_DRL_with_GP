@@ -179,6 +179,7 @@ def common_arg_parser():
     parser.add_argument('--save_video_length', help='Length of recorded video. Default: 200', default=200, type=int)
     parser.add_argument('--log_path', help='Directory to save learning curve data.', default=None, type=str)
     parser.add_argument('--play', default=False, action='store_true')
+    parser.add_argument('--load_actor', help='load stored actor policy', default=None, type=str)
     return parser
 
 def robotics_arg_parser():

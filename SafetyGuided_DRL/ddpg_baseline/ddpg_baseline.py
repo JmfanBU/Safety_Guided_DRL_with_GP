@@ -12,6 +12,7 @@ import baselines.common.tf_util as U
 
 from baselines import logger
 import numpy as np
+import tensorflow as tf
 
 try:
     from mpi4py import MPI
@@ -43,6 +44,7 @@ def learn(network, env,
           eval_env=None,
           param_noise_adaption_interval=50,
           callback=None,
+          load_actor_params=None,
           **network_kwargs):
 
     set_global_seeds(seed)
@@ -67,6 +69,7 @@ def learn(network, env,
 
     action_noise = None
     param_noise = None
+
     if noise_type is not None:
         for current_noise_type in noise_type.split(','):
             current_noise_type = current_noise_type.strip()
@@ -100,6 +103,20 @@ def learn(network, env,
     sess = U.get_session()
     # Prepare everything.
     agent.initialize(sess)
+
+    if load_actor_params is not None:
+        logger.info('Load pretrained actor for testing.')
+        action_noise=None
+        param_noise=None
+        nb_train_steps = 0
+        cur_scope = actor.vars[0].name[0:actor.vars[0].name.find('/')]
+        orig_scope = list(load_actor_params.keys())[0][0:list(load_actor_params.keys())[0].find('/')]
+        print("current scope: {}, original scope: {}".format(cur_scope,orig_scope))
+        for i in range(len(actor.vars)):
+            if actor.vars[i].name.replace(cur_scope, orig_scope, 1) in load_actor_params:
+                assign_op = actor.vars[i].assign(load_actor_params[actor.vars[i].name.replace(cur_scope, orig_scope, 1)])
+                sess.run(assign_op)
+
     sess.graph.finalize()
 
     agent.reset()

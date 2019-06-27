@@ -84,7 +84,7 @@ def callback(localv, globalv, guard=False):
         joblib.dump(save_dict, logger.get_dir() + '/params/guard_params' + '.pkl', compress=True)
 
     # Store actor params every 10 epochs
-    if localv['cycle'] % output_interval != 0:
+    if localv['epoch'] % output_interval != 0:
         return
     joblib.dump(save_dict, logger.get_dir()+'/params/actor_params_'+str(localv['epoch'])+'.pkl', compress=True)
 
@@ -111,11 +111,16 @@ def train(args, extra_args):
 
     print('Training {} on {}:{} with arguments \n{}'.format(args.alg, env_type, env_id, alg_kwargs))
 
+    actor_params=None
+    if args.load_actor is not None:
+        actor_params = joblib.load(args.load_actor)
+
     model = learn(
         env=env,
         seed=seed,
         total_timesteps=total_timesteps,
         callback=callback,
+        load_actor_params=actor_params,
         **alg_kwargs
     )
 
