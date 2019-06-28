@@ -74,7 +74,7 @@ class DDPG(object):
     def __init__(self, actor, critic, guard, memory, observation_shape, action_shape, param_noise=None, action_noise=None,
         gamma=0.99, tau=0.001, normalize_returns=False, enable_popart=False, normalize_observations=True,
         batch_size=128, observation_range=(-5., 5.), action_range=(-1., 1.), return_range=(-np.inf, np.inf), safety_return_range=(-np.inf, np.inf),
-        critic_l2_reg=0., actor_lr=1e-4, critic_lr=1e-3, clip_norm=None, reward_scale=1., noise_delta=0.1, max_action=None):
+        critic_l2_reg=0., actor_lr=1e-4, critic_lr=1e-3, guard_lr=1e-2, clip_norm=None, reward_scale=1., noise_delta=0.1, max_action=None):
         # Inputs.
         self.obs0 = tf.placeholder(tf.float32, shape=(None,) + observation_shape, name='obs0')
         self.obs1 = tf.placeholder(tf.float32, shape=(None,) + observation_shape, name='obs1')
@@ -105,6 +105,7 @@ class DDPG(object):
         self.actor = actor
         self.actor_lr = actor_lr
         self.critic_lr = critic_lr
+        self.guard_lr = guard_lr
         self.clip_norm = clip_norm
         self.enable_popart = enable_popart
         self.reward_scale = reward_scale
@@ -159,6 +160,8 @@ class DDPG(object):
             self.mean_with_actor_tf, self.cinterval_with_actor_tf = self.gp.build_evaluation(
                 tf.concat([self.obs0, self.actor_tf*max_action], axis=-1))
             self.log_likelihood = self.gp.likelihood_tensor
+            self.cov_K = self.kernel.K(self.X)
+            self.inv_K = tf.matrix_inverse(self.cov_K)
         self.X_feature = np.empty((0, observation_shape[0]+action_shape[0]), dtype=np.float32)
         self.Y_label = np.empty((0, 1), dtype=np.float32)
 
@@ -375,14 +378,14 @@ class DDPG(object):
             action += noise
         action = np.clip(action, self.action_range[0], self.action_range[1])
 
-        return action, q, None, None
+        return action, q, g, None
 
-    def store_transition(self, obs0, action, reward, obs1, terminal1):
+    def store_transition(self, obs0, action, reward, cost, obs1, terminal1):
         reward *= self.reward_scale
 
         B = obs0.shape[0]
         for b in range(B):
-            self.memory.append(obs0[b], action[b], reward[b], obs1[b], terminal1[b])
+            self.memory.append(obs0[b], action[b], reward[b], cost[b], obs1[b], terminal1[b])
             if self.normalize_observations:
                 self.obs_rms.update(np.array([obs0[b]]))
 
@@ -402,6 +405,17 @@ class DDPG(object):
                 self.old_mean : np.array([old_mean]),
             })
 
+            old_cost_mean, old_cost_std, target_G = self.sess.run([self.safety_ret_rms.mean, self.safety_ret_rms.std, self.target_G], feed_dict={
+                self.obs1: batch['obs1'],
+                self.costs: batch['costs'],
+                self.terminals1: batch['terminals1'].astype('float32'),
+            })
+            self.safety_ret_rms.update(target_G.flatten())
+            self.sess.run(self.renormalize_G_outputs_op, feed_dict={
+                self.old_cost_std : np.array([old_cost_std]),
+                self.old_cost_mean : np.array([old_cost_mean]),
+            })
+
             # Run sanity check. Disabled by default since it slows down things considerably.
             # print('running sanity check')
             # target_Q_new, new_mean, new_std = self.sess.run([self.target_Q, self.ret_rms.mean, self.ret_rms.std], feed_dict={
@@ -417,18 +431,28 @@ class DDPG(object):
                 self.rewards: batch['rewards'],
                 self.terminals1: batch['terminals1'].astype('float32'),
             })
+            target_G = self.sess.run(self.target_G, feed_dict={
+                self.obs1: batch['obs1'],
+                self.costs: batch['costs'],
+                self.terminals1: batch['terminals1'].astype('float32'),
+            })
 
         # Get all gradients and perform a synced update.
-        ops = [self.actor_grads, self.actor_loss, self.critic_grads, self.critic_loss]
-        actor_grads, actor_loss, critic_grads, critic_loss = self.sess.run(ops, feed_dict={
+        ops = [self.actor_grads, self.actor_loss, self.critic_grads, self.critic_loss, self.guard_grads, self.guard_loss]
+        feed_dict={
             self.obs0: batch['obs0'],
             self.actions: batch['actions'],
             self.critic_target: target_Q,
-        })
+            self.guard_target: target_G,
+            self.X: self.X_feature,
+            self.Y: self.Y_label
+        }
+        actor_grads, actor_loss, critic_grads, critic_loss, guard_grads, guard_loss = self.sess.run(ops, feed_dict=feed_dict)
         self.actor_optimizer.update(actor_grads, stepsize=self.actor_lr)
         self.critic_optimizer.update(critic_grads, stepsize=self.critic_lr)
+        self.guard_optimizer.update(guard_grads, stepsize=self.guard_lr)
 
-        return critic_loss, actor_loss
+        return critic_loss, actor_loss, guard_loss
 
     def initialize(self, sess):
         self.sess = sess
@@ -499,3 +523,58 @@ class DDPG(object):
             self.sess.run(self.perturb_policy_ops, feed_dict={
                 self.param_noise_stddev: self.param_noise.current_stddev,
             })
+
+    def gp_optimization(self):
+        feed_dict = {self.X: self.X_feature,
+                     self.Y: self.Y_label}
+        self.sess.run(self.gp_optimizer, feed_dict=feed_dict)
+        return self.sess.run(self.log_likelihood, feed_dict)
+
+    def add_new_data(self, x, y, dataset_size=100000):
+        self.X_feature = np.vstack((self.X_feature, np.atleast_2d(x)))
+        self.Y_label = np.vstack((self.Y_label, np.atleast_2d(y)))
+
+        # Check sigularity of the convariance matrix and eliminate
+        # dependent features
+        feed_dict={self.X: self.X_feature}
+        cov_K = self.sess.run(self.cov_K, feed_dict=feed_dict)
+        idx = self.independency_check(cov_K)
+        if idx is not None:
+            self.eliminate_data_point(idx)
+
+        length = self.X_feature.shape[0]
+        if length > dataset_size:
+            # eliminate data with lower independent score
+            self.independent_score(dataset_size)
+
+
+    def independency_check(self, cov_K):
+        K = np.flip(np.flip(cov_K, 0), 1)
+        q, r = np.linalg.qr(K)
+        diag = np.absolute(np.diag(r))
+        tol = 1e-5
+        logger.info("Minimum singular value: {}".format(np.amin(diag)))
+        if diag[diag > tol].shape[0] != cov_K.shape[0]:
+            idx = np.where(diag <= tol)[0]
+            logger.info("Eliminate {} instances due to sigularity.".format(idx.shape[0]))
+            return cov_K.shape[0] - 1 - idx
+
+    def eliminate_data_point(self, idx):
+        self.X_feature = np.delete(self.X_feature, idx, axis=0)
+        self.Y_label = np.delete(self.Y_label, idx, axis=0)
+
+    def independent_score(self, dataset_size):
+        new_data = self.X_feature[dataset_size:]
+        new_label = self.Y_label[dataset_size:]
+
+        for data, label in zip(new_data, new_label):
+            X = np.vstack((self.X_feature[:dataset_size], np.atleast_2d(data)))
+            Y = np.vstack((self.Y_label[:dataset_size], np.atleast_2d(label)))
+            scores = np.zeros(dataset_size + 1)
+            feed_dict = {self.X: X}
+            K_inv = self.sess.run(self.inv_K, feed_dict=feed_dict)
+            scores = 1/np.diag(K_inv)
+
+            min_id = np.argmin(scores)
+            logger.info("Detect {} instances with lowest independt score and eliminate the last one.".format(min_id.shape))
+            self.eliminate_data_point(min_id[-1])

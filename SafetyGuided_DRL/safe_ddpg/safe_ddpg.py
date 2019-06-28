@@ -20,6 +20,7 @@ except ImportError:
     MPI = None
 
 DELTA = 0.1
+DIFF_TAU = 1e-5
 
 def learn(network, env,
           seed=None,
@@ -36,6 +37,7 @@ def learn(network, env,
           critic_l2_reg=1e-2,
           actor_lr=1e-4,
           critic_lr=1e-3,
+          guard_lr=1e-2,
           popart=False,
           gamma=0.99,
           clip_norm=None,
@@ -96,7 +98,7 @@ def learn(network, env,
     agent = DDPG(actor, critic, guard, memory, env.observation_space.shape, env.action_space.shape,
         gamma=gamma, tau=tau, normalize_returns=normalize_returns, normalize_observations=normalize_observations,
         batch_size=batch_size, action_noise=action_noise, param_noise=param_noise, critic_l2_reg=critic_l2_reg,
-        actor_lr=actor_lr, critic_lr=critic_lr, enable_popart=popart, clip_norm=clip_norm,
+        actor_lr=actor_lr, critic_lr=critic_lr, guard_lr=guard_lr, enable_popart=popart, clip_norm=clip_norm,
         reward_scale=reward_scale, noise_delta=DELTA, max_action=max_action)
     logger.info('Using agent with the following configuration:')
     logger.info(str(agent.__dict__.items()))
@@ -239,7 +241,7 @@ def learn(network, env,
 
 
             # store new data
-            agent.add_new_data(X_feature, Y_label, datasize=2000)
+            agent.add_new_data(X_feature, Y_label, dataset_size=2000)
             # clear local feature and lable
             X_feature = np.empty((0, env.observation_space.shape[0] + env.action_space.shape[0]), dtype=np.float32)
             Y_label = np.empty((0, 1), dtype=np.float32)
@@ -247,7 +249,12 @@ def learn(network, env,
             logger.info("Dataset size: {}".format(agent.X_feature.shape))
 
             # Update GP hyperparameters
-            agent.gp_optimization
+            old_log_likelihood = -np.inf
+            diff_likelihood = 1
+            while diff_likelihood > DIFF_TAU:
+                log_likelihood = agent.gp_optimization()
+                diff_likelihood = np.exp(log_likelihood) - np.exp(old_log_likelihood)
+                old_log_likelihood = log_likelihood
 
             # Train.
             epoch_actor_losses = []
