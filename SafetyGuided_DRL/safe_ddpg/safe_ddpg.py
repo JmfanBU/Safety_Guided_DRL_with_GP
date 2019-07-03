@@ -262,6 +262,8 @@ def learn(network, env,
             iters = 0
             while diff_log_likelihood > DIFF_TAU or iters < 10:
                 log_likelihood = agent.gp_optimization()
+                if log_likelihood is None:
+                    break
                 diff_log_likelihood = np.exp(log_likelihood) - np.exp(old_log_likelihood)
                 old_log_likelihood = log_likelihood
                 iters += 1

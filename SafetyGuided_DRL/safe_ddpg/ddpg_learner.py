@@ -116,6 +116,7 @@ class DDPG(object):
         self.critic_l2_reg = critic_l2_reg
         self.guard_l2_reg = critic_l2_reg
         self.mu_value = 1e-3
+        self.min_sigular_value = np.inf
 
         # Observation normalization.
         if self.normalize_observations:
@@ -537,10 +538,13 @@ class DDPG(object):
             })
 
     def gp_optimization(self):
-        feed_dict = {self.X: self.X_feature,
-                     self.Y: self.Y_label}
-        self.sess.run(self.gp_optimizer, feed_dict=feed_dict)
-        return self.sess.run(self.log_likelihood, feed_dict=feed_dict)
+        if self.min_sigular_value > 2e-5:
+            feed_dict = {self.X: self.X_feature,
+                         self.Y: self.Y_label}
+            self.sess.run(self.gp_optimizer, feed_dict=feed_dict)
+            return self.sess.run(self.log_likelihood, feed_dict=feed_dict)
+        else:
+            return None
 
     def add_new_data(self, x, y, dataset_size=100000):
         self.X_feature = np.vstack((self.X_feature, np.atleast_2d(x)))
@@ -564,6 +568,7 @@ class DDPG(object):
         q, r = np.linalg.qr(K)
         diag = np.absolute(np.diag(r))
         tol = 1e-5
+        self.min_sigular_value = np.amin(diag)
         logger.info("Minimum singular value: {}".format(np.amin(diag)))
         if diag[diag > tol].shape[0] != cov_K.shape[0]:
             idx = np.where(diag <= tol)[0]
