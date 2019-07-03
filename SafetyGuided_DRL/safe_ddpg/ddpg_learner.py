@@ -12,6 +12,7 @@ import baselines.common.tf_util as U
 from baselines.common.mpi_running_mean_std import RunningMeanStd
 
 from SafetyGuided_DRL.gp_models import GPR
+from SafetyGuided_DRL.gp_models import RBF_regularized
 try:
     from mpi4py import MPI
 except ImportError:
@@ -85,6 +86,7 @@ class DDPG(object):
         self.critic_target = tf.placeholder(tf.float32, shape=(None, 1), name='critic_target')
         self.guard_target = tf.placeholder(tf.float32, shape=(None, 1), name='guard_target')
         self.param_noise_stddev = tf.placeholder(tf.float32, shape=(), name='param_noise_stddev')
+        self.mu = tf.placeholder(tf.float32, name='barrier_coefficient')
         self.X = tf.placeholder(tf.float32, shape=(None, observation_shape[0]+action_shape[0]), name='gp_feature')
         self.Y = tf.placeholder(tf.float32, shape=(None, 1), name='gp_label')
 
@@ -112,6 +114,8 @@ class DDPG(object):
         self.batch_size = batch_size
         self.stats_sample = None
         self.critic_l2_reg = critic_l2_reg
+        self.guard_l2_reg = critic_l2_reg
+        self.mu_value = 1e-3
 
         # Observation normalization.
         if self.normalize_observations:
@@ -150,15 +154,15 @@ class DDPG(object):
 
         # gaussian process
         with tf.device('/device:GPU:1'):
-            self.kernel = gpflow.kernels.RBF_regularized(
+            self.kernel = RBF_regularized(
                 input_dim=observation_shape[0]+action_shape[0],
                 ARD=True, noise=noise_delta) # gp kernel
             self.gp = GPR(self.X, self.Y, self.kernel)
             self.gp.likelihood.variance = noise_delta
             self.mean, self.cinterval = self.gp.build_evaluation(
-                tf.concat([self.obs0, self.actions*max_action], axis=-1))
+                tf.concat([self.obs0, self.actions], axis=-1))
             self.mean_with_actor_tf, self.cinterval_with_actor_tf = self.gp.build_evaluation(
-                tf.concat([self.obs0, self.actor_tf*max_action], axis=-1))
+                tf.concat([self.obs0, self.actor_tf], axis=-1))
             self.log_likelihood = self.gp.likelihood_tensor
             self.cov_K = self.kernel.K(self.X)
             self.inv_K = tf.matrix_inverse(self.cov_K)
@@ -170,7 +174,7 @@ class DDPG(object):
         self.critic_tf = denormalize(tf.clip_by_value(self.normalized_critic_tf, self.return_range[0], self.return_range[1]), self.ret_rms)
         self.normalized_critic_with_actor_tf = critic(normalized_obs0, self.actor_tf, reuse=True)
         self.critic_with_actor_tf = denormalize(tf.clip_by_value(self.normalized_critic_with_actor_tf, self.return_range[0], self.return_range[1]), self.ret_rms)
-        self.normalized_critic_with_actor_tf_gp = critic(normalized_obs0, self.actor_tf, self.mean_with_actor_tf, self.cinterval_with_actor_tf, reuse=True)
+        self.normalized_critic_with_actor_tf_gp = critic(normalized_obs0, self.actor_tf, self.mean_with_actor_tf, self.cinterval_with_actor_tf, self.mu, reuse=True)
         self.critic_with_actor_tf_gp = denormalize(tf.clip_by_value(self.normalized_critic_with_actor_tf_gp, self.return_range[0], self.return_range[1]), self.ret_rms)
         Q_obs1 = denormalize(target_critic(normalized_obs1, target_actor(normalized_obs1)), self.ret_rms)
         self.target_Q = self.rewards + (1. - self.terminals1) * gamma * Q_obs1
@@ -376,6 +380,9 @@ class DDPG(object):
             noise = self.action_noise()
             assert noise.shape == action[0].shape
             action += noise
+
+        if np.isnan(action):
+            raise ValueError("action is None and obs: {}".format(obs))
         action = np.clip(action, self.action_range[0], self.action_range[1])
 
         return action, q, g, None
@@ -445,18 +452,23 @@ class DDPG(object):
             self.critic_target: target_Q,
             self.guard_target: target_G,
             self.X: self.X_feature,
-            self.Y: self.Y_label
+            self.Y: self.Y_label,
+            self.mu: self.mu_value
         }
         actor_grads, actor_loss, critic_grads, critic_loss, guard_grads, guard_loss = self.sess.run(ops, feed_dict=feed_dict)
+        if np.isnan(actor_grads).any():
+            logger.info("Approach the safety boundary with gradient {}.".format(actor_grads))
+            actor_grads[np.isnan(actor_grads)] = 0.0
         self.actor_optimizer.update(actor_grads, stepsize=self.actor_lr)
         self.critic_optimizer.update(critic_grads, stepsize=self.critic_lr)
         self.guard_optimizer.update(guard_grads, stepsize=self.guard_lr)
+        # print("actor grads: {}, mu value: {}".format(actor_grads.max(), self.mu_value))
 
         return critic_loss, actor_loss, guard_loss
 
     def initialize(self, sess):
         self.sess = sess
-        self.sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.global_variables_initializer(), feed_dict=self.gp.update_feed_dict())
         self.actor_optimizer.sync()
         self.critic_optimizer.sync()
         self.sess.run(self.target_init_updates)
@@ -528,7 +540,7 @@ class DDPG(object):
         feed_dict = {self.X: self.X_feature,
                      self.Y: self.Y_label}
         self.sess.run(self.gp_optimizer, feed_dict=feed_dict)
-        return self.sess.run(self.log_likelihood, feed_dict)
+        return self.sess.run(self.log_likelihood, feed_dict=feed_dict)
 
     def add_new_data(self, x, y, dataset_size=100000):
         self.X_feature = np.vstack((self.X_feature, np.atleast_2d(x)))
@@ -546,7 +558,6 @@ class DDPG(object):
         if length > dataset_size:
             # eliminate data with lower independent score
             self.independent_score(dataset_size)
-
 
     def independency_check(self, cov_K):
         K = np.flip(np.flip(cov_K, 0), 1)
@@ -566,7 +577,7 @@ class DDPG(object):
     def independent_score(self, dataset_size):
         new_data = self.X_feature[dataset_size:]
         new_label = self.Y_label[dataset_size:]
-
+        logger.info("Detect {} instances with lowest independent score and eliminate the last one.".format(new_data.shape[0]))
         for data, label in zip(new_data, new_label):
             X = np.vstack((self.X_feature[:dataset_size], np.atleast_2d(data)))
             Y = np.vstack((self.Y_label[:dataset_size], np.atleast_2d(label)))
@@ -575,6 +586,5 @@ class DDPG(object):
             K_inv = self.sess.run(self.inv_K, feed_dict=feed_dict)
             scores = 1/np.diag(K_inv)
 
-            min_id = np.argmin(scores)
-            logger.info("Detect {} instances with lowest independt score and eliminate the last one.".format(min_id.shape))
+            min_id = np.where(scores == scores.min())[0]
             self.eliminate_data_point(min_id[-1])

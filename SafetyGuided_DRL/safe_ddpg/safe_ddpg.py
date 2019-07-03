@@ -19,8 +19,8 @@ try:
 except ImportError:
     MPI = None
 
-DELTA = 0.1
-DIFF_TAU = 1e-5
+DELTA = 1e-1
+DIFF_TAU = 1e-1
 
 def learn(network, env,
           seed=None,
@@ -43,12 +43,14 @@ def learn(network, env,
           clip_norm=None,
           nb_train_steps=50, # per epoch cycle and MPI worker,
           nb_eval_steps=100,
-          batch_size=64, # per MPI worker
+          batch_size=100, # per MPI worker
           tau=0.01,
           eval_env=None,
           param_noise_adaption_interval=50,
           callback=None,
           load_actor_params=None,
+          actor_activation='relu',
+          value_activation='relu',
           **network_kwargs):
 
     set_global_seeds(seed)
@@ -68,9 +70,9 @@ def learn(network, env,
     assert (np.abs(env.action_space.low) == env.action_space.high).all()  # we assume symmetric actions.
 
     memory = Memory(limit=int(1e6), action_shape=env.action_space.shape, observation_shape=env.observation_space.shape)
-    critic = Critic(network=network, **network_kwargs)
-    guard = Guard(network=network, **network_kwargs)
-    actor = Actor(nb_actions, network=network, **network_kwargs)
+    critic = Critic(network=network, activation_type=value_activation, **network_kwargs)
+    guard = Guard(network=network, activation_type=value_activation, **network_kwargs)
+    actor = Actor(nb_actions, network=network, activation_type=actor_activation, **network_kwargs)
 
     action_noise = None
     param_noise = None
@@ -137,6 +139,8 @@ def learn(network, env,
     episode_reward = np.zeros(nenvs, dtype=np.float32) #vector
     episode_cost = np.zeros(nenvs, dtype=np.float32)
     episode_step = np.zeros(nenvs, dtype=int) # vector
+    episode_safe_step = np.zeros(nenvs, dtype=int) # vector
+    episode_unsafe_step = np.zeros(nenvs, dtype=int) # vector
     episodes = 0 #scalar
     t = 0 # scalar
 
@@ -189,23 +193,23 @@ def learn(network, env,
                 _, new_q, new_g, _ = agent.step(new_obs, apply_noise=False, compute_Q=True)
                 agent.store_transition(obs, action, r, cost, new_obs, done) #the batched data will be unrolled in memory.py's append.
 
-                if load_actor_params is not None:
+                if load_actor_params is None:
                     # update GP every iterations for safety
-                    feature = np.concatenate((obs, max_action*action), axis=-1)
+                    feature = np.concatenate((obs, action), axis=-1)
                     g_hat = new_g - g
                     skip_flag = True
                     if np.absolute(-cost - (g_hat)) <= DELTA:
                         skip_flag = False
                     elif np.absolute(cost - (g_hat)) <= DELTA:
                         skip_flag = False
-                    if not skip_flag and (np.absolute(g_hat) >= DELTA):
+                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.absolute(cost) <= DELTA/10):
                         # delete features if they have been seen before
                         num_eliminate = 0
                         for idx, feature_i in enumerate(X_feature):
                             if cauchy_schwartz_check(feature, feature_i):
                                 X_feature = np.delete(X_feature, idx-num_eliminate, axis=0)
                                 Y_label = np.delete(Y_label, idx-num_eliminate, axis=0)
-                                num_eliminate = 0
+                                num_eliminate += 1
                         # delete older features that have been seen before
                         num_eliminate = 0
                         for idx, feature_i in enumerate(agent.X_feature):
@@ -216,16 +220,18 @@ def learn(network, env,
                         X_feature = np.vstack((X_feature, np.atleast_2d(feature.astype(np.float32))))
                         Y_label = np.vstack((Y_label, np.atleast_2d(g_hat)))
 
-                if g_hat >= 0:
-                    print('Safe action with g_hat: {}'.format(g_hat))
-                else:
-                    print('Unsafe action with g_hat: {}'.format(g_hat))
+                    if g_hat >= 0:
+                        episode_safe_step += 1
+                    else:
+                        episode_unsafe_step += 1
 
                 obs = new_obs
 
                 for d in range(len(done)):
                     if done[d]:
                         # Episode done.
+                        # print('Safe steps: {}, unsafe steps: {}'.format(episode_safe_step[d], episode_unsafe_step[d]))
+                        # print("Dataset size: {}".format(agent.X_feature.shape))
                         epoch_episode_rewards.append(episode_reward[d])
                         epoch_episode_costs.append(episode_cost[d])
                         episode_rewards_history.append(episode_reward[d])
@@ -234,6 +240,8 @@ def learn(network, env,
                         episode_reward[d] = 0
                         episode_cost[d] = 0
                         episode_step[d] = 0
+                        episode_safe_step[d] = 0
+                        episode_unsafe_step[d] = 0
                         epoch_episodes += 1
                         episodes += 1
                         if nenvs == 1:
@@ -250,17 +258,22 @@ def learn(network, env,
 
             # Update GP hyperparameters
             old_log_likelihood = -np.inf
-            diff_likelihood = 1
-            while diff_likelihood > DIFF_TAU:
+            diff_log_likelihood = np.inf
+            iters = 0
+            while diff_log_likelihood > DIFF_TAU or iters < 10:
                 log_likelihood = agent.gp_optimization()
-                diff_likelihood = np.exp(log_likelihood) - np.exp(old_log_likelihood)
+                diff_log_likelihood = np.exp(log_likelihood) - np.exp(old_log_likelihood)
                 old_log_likelihood = log_likelihood
+                iters += 1
+            logger.info("Optimize GP hyperparameters for {} iterations.".format(iters))
 
             # Train.
             epoch_actor_losses = []
             epoch_critic_losses = []
             epoch_guard_losses = []
             epoch_adaptive_distances = []
+            agent.mu_value *= 0.1
+            agent.mu_value = max(agent.mu_value, 1e-10)
             for t_train in range(nb_train_steps):
                 # Adapt param noise, if necessary.
                 if memory.nb_entries >= batch_size and t_train % param_noise_adaption_interval == 0:

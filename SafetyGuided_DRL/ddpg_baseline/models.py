@@ -3,9 +3,16 @@ from baselines.common.models import get_network_builder
 
 
 class Model(object):
-    def __init__(self, name, network='mlp', **network_kwargs):
+    def __init__(self, name, network='mlp', activation_type='relu', **network_kwargs):
         self.name = name
-        self.network_builder = get_network_builder(network)(activation=tf.nn.relu, **network_kwargs)
+        if activation_type == 'relu':
+            self.activation = tf.nn.relu
+        elif activation_type == 'tanh':
+            self.activation = tf.nn.tanh
+        elif activation_type == 'sigmoid':
+            self.activation = tf.nn.sigmoid
+
+        self.network_builder = get_network_builder(network)(activation=self.activation, **network_kwargs)
 
     @property
     def vars(self):
@@ -21,8 +28,8 @@ class Model(object):
 
 
 class Actor(Model):
-    def __init__(self, nb_actions, name='actor', network='mlp', **network_kwargs):
-        super().__init__(name=name, network=network, **network_kwargs)
+    def __init__(self, nb_actions, name='actor', network='mlp', activation_type='relu', **network_kwargs):
+        super().__init__(name=name, network=network, activation_type=activation_type, **network_kwargs)
         self.nb_actions = nb_actions
 
     def __call__(self, obs, reuse=False):
@@ -34,8 +41,8 @@ class Actor(Model):
 
 
 class Critic(Model):
-    def __init__(self, name='critic', network='mlp', **network_kwargs):
-        super().__init__(name=name, network=network, **network_kwargs)
+    def __init__(self, name='critic', network='mlp', activation_type='relu', **network_kwargs):
+        super().__init__(name=name, network=network, activation_type=activation_type, **network_kwargs)
         self.layer_norm = True
 
     def __call__(self, obs, action, reuse=False):

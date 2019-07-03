@@ -1,4 +1,6 @@
 from gym.envs.registration import register
+from SafetyGuided_DRL.envs.monitor import Monitor
+from SafetyGuided_DRL.envs.monitor import SafeMonitor
 
 # Classic
 # ----------------------------------------
@@ -81,70 +83,70 @@ register(
 # 2D
 register(
     id='ReacherGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:ReacherEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:ReacherEnv',
     max_episode_steps=50,
     reward_threshold=-3.75,
 )
 
 register(
     id='Reacher3dGP-v1',
-    entry_point='SafetyGuided_DRL.envs.mujoco:Reacher3dEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:Reacher3dEnv',
     max_episode_steps=500,
     reward_threshold=-200,
 )
 
 register(
     id='PusherGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:PusherEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:PusherEnv',
     max_episode_steps=100,
     reward_threshold=0.0,
 )
 
 register(
     id='ThrowerGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:ThrowerEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:ThrowerEnv',
     max_episode_steps=100,
     reward_threshold=0.0,
 )
 
 register(
     id='StrikerGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:StrikerEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:StrikerEnv',
     max_episode_steps=100,
     reward_threshold=0.0,
 )
 
 register(
     id='InvertedPendulumGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:InvertedPendulumEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:InvertedPendulumEnv',
     max_episode_steps=1000,
     reward_threshold=950.0,
 )
 
 register(
     id='InvertedDoublePendulumGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:InvertedDoublePendulumEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:InvertedDoublePendulumEnv',
     max_episode_steps=1000,
     reward_threshold=9100.0,
 )
 
 register(
     id='HalfCheetahGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:HalfCheetahEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:HalfCheetahEnv',
     max_episode_steps=1000,
     reward_threshold=4800.0,
 )
 
 register(
     id='HopperGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:HopperEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:HopperEnv',
     max_episode_steps=1000,
     reward_threshold=3800.0,
 )
 
 register(
     id='SwimmerGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:SwimmerEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:SwimmerEnv',
     max_episode_steps=1000,
     reward_threshold=360.0,
 )
@@ -152,25 +154,25 @@ register(
 register(
     id='Walker2dGP-v2',
     max_episode_steps=1000,
-    entry_point='SafetyGuided_DRL.envs.mujoco:Walker2dEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:Walker2dEnv',
 )
 
 register(
     id='AntGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:AntEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:AntEnv',
     max_episode_steps=1000,
     reward_threshold=6000.0,
 )
 
 register(
     id='HumanoidGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:HumanoidEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:HumanoidEnv',
     max_episode_steps=1000,
 )
 
 register(
     id='HumanoidStandupGP-v2',
-    entry_point='SafetyGuided_DRL.envs.mujoco:HumanoidStandupEnv',
+    entry_point='SafetyGuided_DRL.envs.mujocoGP:HumanoidStandupEnv',
     max_episode_steps=1000,
 )
 

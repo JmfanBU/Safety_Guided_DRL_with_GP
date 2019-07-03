@@ -12,6 +12,8 @@ try:
 except ImportError as e:
     raise error.DependencyNotInstalled("{}. (HINT: you need to install mujoco_py, and also perform the setup instructions here: https://github.com/openai/mujoco-py/.)".format(e))
 
+DEFAULT_SIZE = 1000
+
 class MujocoEnv(gym.Env):
     """Superclass for all MuJoCo environments.
     """
@@ -103,23 +105,23 @@ class MujocoEnv(gym.Env):
         for _ in range(n_frames):
             self.sim.step()
 
-    def render(self, mode='human'):
+    def render(self, mode='human', width=DEFAULT_SIZE, height=DEFAULT_SIZE):
         if mode == 'rgb_array':
-            self._get_viewer().render()
+            self._get_viewer(mode).render(width, height, camera_id = 0)
             # window size used for old mujoco-py:
-            width, height = 500, 500
-            data = self._get_viewer().read_pixels(width, height, depth=False)
+            data = self._get_viewer(mode).read_pixels(width, height, depth=False)
             # original image is upside-down, so flip it
             return data[::-1, :, :]
         elif mode == 'human':
-            self._get_viewer().render()
+            self._get_viewer(mode).render()
 
     def close(self):
         if self.viewer is not None:
-            self.viewer.finish()
+            # self.viewer.finish()
             self.viewer = None
+            self._viewers = {}
 
-    def _get_viewer(self):
+    def _get_viewer(self, mode):
         self.viewer = self._viewers.get(mode)
         if self.viewer is None:
             if mode == 'human':

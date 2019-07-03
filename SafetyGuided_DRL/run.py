@@ -31,7 +31,7 @@ try:
 except ImportError:
     roboschool = None
 
-output_interval = 10
+output_interval = 100
 
 _game_envs = defaultdict(set)
 for env in gym.envs.registry.all():

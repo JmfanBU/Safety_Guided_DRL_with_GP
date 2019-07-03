@@ -14,10 +14,11 @@ import os.path as osp
 from gym.wrappers import FlattenDictWrapper
 from baselines import logger
 from SafetyGuided_DRL.bench.monitor import LogMonitor as Monitor
+from SafetyGuided_DRL.bench.monitor import SafeLogMonitor as SafeMonitor
 from baselines.common import set_global_seeds
 from baselines.common.atari_wrappers import make_atari, wrap_deepmind
 from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
-from baselines.common.vec_env.dummy_vec_env import DummyVecEnv
+from SafetyGuided_DRL.common.vec_env.dummy_vec_env import DummyVecEnv, SafeDummyVecEnv
 from baselines.common import retro_wrappers
 from baselines.common.wrappers import ClipActionsWrapper
 
@@ -60,7 +61,10 @@ def make_vec_env(env_id, env_type, num_env, seed,
     if not force_dummy and num_env > 1:
         return SubprocVecEnv([make_thunk(i + start_index, initializer=initializer) for i in range(num_env)])
     else:
-        return DummyVecEnv([make_thunk(i + start_index, initializer=None) for i in range(num_env)])
+        if env_type == 'mujocoGP':
+            return SafeDummyVecEnv([make_thunk(i + start_index, initializer=None) for i in range(num_env)])
+        else:
+            return DummyVecEnv([make_thunk(i + start_index, initializer=None) for i in range(num_env)])
 
 
 def make_env(env_id, env_type, mpi_rank=0, subrank=0, seed=None, reward_scale=1.0, gamestate=None, flatten_dict_observations=True, wrapper_kwargs=None, env_kwargs=None, logger_dir=None, initializer=None, save_video_interval=0):
@@ -84,18 +88,30 @@ def make_env(env_id, env_type, mpi_rank=0, subrank=0, seed=None, reward_scale=1.
     else:
         env = gym.make(env_id, **env_kwargs)
 
-    if save_video_interval != 0:
-        env = gym.wrappers.Monitor(env, logger.get_dir() and osp.join(logger.get_dir(), 'videos'), video_callable=lambda episode_id: episode_id%save_video_interval==0, force=True)
+    if env_type == 'mujocoGP':
+        if save_video_interval != 0:
+            env = SafetyGuided_DRL.envs.monitor.SafeMonitor(env, logger.get_dir() and osp.join(logger.get_dir(), 'videos'), video_callable=lambda episode_id: episode_id%save_video_interval==0, force=True)
 
-    if flatten_dict_observations and isinstance(env.observation_space, gym.spaces.Dict):
-        keys = env.observation_space.spaces.keys()
-        env = gym.wrappers.FlattenDictWrapper(env, dict_keys=list(keys))
+        if flatten_dict_observations and isinstance(env.observation_space, gym.spaces.Dict):
+            keys = env.observation_space.spaces.keys()
+            env = gym.wrappers.FlattenDictWrapper(env, dict_keys=list(keys))
 
-    env.seed(seed + subrank if seed is not None else None)
-    env = Monitor(env,
-                  logger_dir and os.path.join(logger_dir, str(mpi_rank) + '.' + str(subrank)),
-                  allow_early_resets=True)
+        env.seed(seed + subrank if seed is not None else None)
+        env = SafeMonitor(env,
+                      logger_dir and os.path.join(logger_dir, str(mpi_rank) + '.' + str(subrank)),
+                      allow_early_resets=True)
+    else:
+        if save_video_interval != 0:
+            env = SafetyGuided_DRL.envs.monitor.Monitor(env, logger.get_dir() and osp.join(logger.get_dir(), 'videos'), video_callable=lambda episode_id: episode_id%save_video_interval==0, force=True)
 
+        if flatten_dict_observations and isinstance(env.observation_space, gym.spaces.Dict):
+            keys = env.observation_space.spaces.keys()
+            env = gym.wrappers.FlattenDictWrapper(env, dict_keys=list(keys))
+
+        env.seed(seed + subrank if seed is not None else None)
+        env = Monitor(env,
+                      logger_dir and os.path.join(logger_dir, str(mpi_rank) + '.' + str(subrank)),
+                      allow_early_resets=True)
 
     if env_type == 'atari':
         env = wrap_deepmind(env, **wrapper_kwargs)

@@ -1,4 +1,4 @@
-__all__ = ['LogMonitor', 'get_monitor_files', 'load_results']
+__all__ = ['LogMonitor', 'SafeLogMonitor', 'get_monitor_files', 'load_results']
 
 import gym
 from gym.core import Wrapper
@@ -11,6 +11,7 @@ import numpy as np
 import os
 import uuid
 import pandas
+
 
 class LogMonitor(Wrapper):
     EXT = "monitor.csv"
@@ -97,6 +98,100 @@ class LogMonitor(Wrapper):
     def get_episode_times(self):
         return self.episode_times
 
+
+class SafeLogMonitor(Wrapper):
+    EXT = "monitor.csv"
+    f = None
+
+    def __init__(self, env, filename, allow_early_resets=False, reset_keywords=(), info_keywords=()):
+        Wrapper.__init__(self, env=env)
+        self.tstart = time.time()
+        if filename:
+            self.results_writer = SafeResultsWriter(filename,
+                header={"t_start": time.time(), 'env_id' : env.spec and env.spec.id},
+                extra_keys=reset_keywords + info_keywords
+            )
+        else:
+            self.results_writer = None
+        self.reset_keywords = reset_keywords
+        self.info_keywords = info_keywords
+        self.allow_early_resets = allow_early_resets
+        self.rewards = None
+        self.costs = None
+        self.needs_reset = True
+        self.episode_rewards = []
+        self.episode_costs = []
+        self.episode_lengths = []
+        self.episode_times = []
+        self.total_steps = 0
+        self.current_reset_info = {} # extra info about the current episode, that was passed in during reset()
+
+    def reset(self, **kwargs):
+        self.reset_state()
+        for k in self.reset_keywords:
+            v = kwargs.get(k)
+            if v is None:
+                raise ValueError('Expected you to pass kwarg %s into reset'%k)
+            self.current_reset_info[k] = v
+        return self.env.reset(**kwargs)
+
+    def reset_state(self):
+        if not self.allow_early_resets and not self.needs_reset:
+            raise RuntimeError("Tried to reset an environment before done. If you want to allow early resets, wrap your env with LogMonitor(env, path, allow_early_resets=True)")
+        self.rewards = []
+        self.costs = []
+        self.needs_reset = False
+
+
+    def step(self, action):
+        if self.needs_reset:
+            raise RuntimeError("Tried to step environment that needs reset")
+        ob, rew, cost, done, info = self.env.step(action)
+        self.update(ob, rew, cost, done, info)
+        return (ob, rew, cost, done, info)
+
+    def update(self, ob, rew, cost, done, info):
+        self.rewards.append(rew)
+        self.costs.append(cost)
+        if done:
+            self.needs_reset = True
+            eprew = sum(self.rewards)
+            epcost = sum(self.costs)
+            eplen = len(self.rewards)
+            epinfo = {"r": round(eprew, 6), "c": round(epcost, 6),"l": eplen, "t": round(time.time() - self.tstart, 6)}
+            for k in self.info_keywords:
+                epinfo[k] = info[k]
+            self.episode_rewards.append(eprew)
+            self.episode_costs.append(epcost)
+            self.episode_lengths.append(eplen)
+            self.episode_times.append(time.time() - self.tstart)
+            epinfo.update(self.current_reset_info)
+            if self.results_writer:
+                self.results_writer.write_row(epinfo)
+            assert isinstance(info, dict)
+            if isinstance(info, dict):
+                info['episode'] = epinfo
+
+        self.total_steps += 1
+
+    def close(self):
+        if self.f is not None:
+            self.f.close()
+
+    def get_total_steps(self):
+        return self.total_steps
+
+    def get_episode_rewards(self):
+        return self.episode_rewards
+
+    def get_episode_costs(self):
+        return self.episode_costs
+
+    def get_episode_lengths(self):
+        return self.episode_lengths
+
+    def get_episode_times(self):
+        return self.episode_times
 class LoadLogMonitorResultsError(Exception):
     pass
 
@@ -115,6 +210,29 @@ class ResultsWriter(object):
             header = '# {} \n'.format(json.dumps(header))
         self.f.write(header)
         self.logger = csv.DictWriter(self.f, fieldnames=('r', 'l', 't')+tuple(extra_keys))
+        self.logger.writeheader()
+        self.f.flush()
+
+    def write_row(self, epinfo):
+        if self.logger:
+            self.logger.writerow(epinfo)
+            self.f.flush()
+
+
+class SafeResultsWriter(object):
+    def __init__(self, filename, header='', extra_keys=()):
+        self.extra_keys = extra_keys
+        assert filename is not None
+        if not filename.endswith(LogMonitor.EXT):
+            if osp.isdir(filename):
+                filename = osp.join(filename, LogMonitor.EXT)
+            else:
+                filename = filename + "." + LogMonitor.EXT
+        self.f = open(filename, "wt")
+        if isinstance(header, dict):
+            header = '# {} \n'.format(json.dumps(header))
+        self.f.write(header)
+        self.logger = csv.DictWriter(self.f, fieldnames=('r', 'c', 'l', 't')+tuple(extra_keys))
         self.logger.writeheader()
         self.f.flush()
 

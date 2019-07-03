@@ -4,7 +4,7 @@ from collections import deque
 import pickle
 
 from baselines.ddpg.ddpg_learner import DDPG
-from SafetyGuided_DRL.safe_ddpg.models import Actor, Critic
+from SafetyGuided_DRL.ddpg_baseline.models import Actor, Critic
 from baselines.ddpg.memory import Memory
 from baselines.ddpg.noise import AdaptiveParamNoiseSpec, NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from baselines.common import set_global_seeds
@@ -35,16 +35,18 @@ def learn(network, env,
           actor_lr=1e-4,
           critic_lr=1e-3,
           popart=False,
-          gamma=0.99,
+          gamma=0.999,
           clip_norm=None,
           nb_train_steps=50, # per epoch cycle and MPI worker,
           nb_eval_steps=100,
-          batch_size=64, # per MPI worker
+          batch_size=100, # per MPI worker
           tau=0.01,
           eval_env=None,
           param_noise_adaption_interval=50,
           callback=None,
           load_actor_params=None,
+          actor_activation='relu',
+          value_activation='relu',
           **network_kwargs):
 
     set_global_seeds(seed)
@@ -64,8 +66,8 @@ def learn(network, env,
     assert (np.abs(env.action_space.low) == env.action_space.high).all()  # we assume symmetric actions.
 
     memory = Memory(limit=int(1e6), action_shape=env.action_space.shape, observation_shape=env.observation_space.shape)
-    critic = Critic(network=network, **network_kwargs)
-    actor = Actor(nb_actions, network=network, **network_kwargs)
+    critic = Critic(network=network, activation_type=value_activation, **network_kwargs)
+    actor = Actor(nb_actions, network=network, activation_type=actor_activation, **network_kwargs)
 
     action_noise = None
     param_noise = None

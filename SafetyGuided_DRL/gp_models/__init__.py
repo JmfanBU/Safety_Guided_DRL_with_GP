@@ -4,6 +4,7 @@
 from .model import Model
 from .model import GPModel
 from .gpr import GPR
+from .regularized_rbf import RBF_regularized
 
 # comment for backup usage
 # from .gpmc import GPMC

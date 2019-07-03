@@ -84,3 +84,8 @@ class GPR(GPModel):
         gamma_n = tf.log(tf.linalg.det(tf.eye(tf.shape(self.X)[0], dtype=settings.float_type) + Kmm/self.noise_sigma**2))
         beta = tf.sqrt(B) + 4 * self.noise_sigma * tf.sqrt(1 + gamma_n + tf.log(1/self.tol))
         return f_mean + self.mean_function(Xnew), f_var, beta
+
+    def update_feed_dict(self):
+        feed_dict = {}
+        feed_dict.update(self.initializable_feeds)
+        return feed_dict
