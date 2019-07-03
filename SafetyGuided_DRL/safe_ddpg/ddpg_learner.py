@@ -582,7 +582,7 @@ class DDPG(object):
     def independent_score(self, dataset_size):
         new_data = self.X_feature[dataset_size:]
         new_label = self.Y_label[dataset_size:]
-        logger.info("Detect {} instances with lowest independent score and eliminate the last one.".format(new_data.shape[0]))
+        logger.info("Detect {} instances with lowest independent score.".format(new_data.shape[0]))
         for data, label in zip(new_data, new_label):
             X = np.vstack((self.X_feature[:dataset_size], np.atleast_2d(data)))
             Y = np.vstack((self.Y_label[:dataset_size], np.atleast_2d(label)))
