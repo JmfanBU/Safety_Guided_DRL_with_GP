@@ -20,7 +20,7 @@ except ImportError:
     MPI = None
 
 DELTA = 1e-1
-DIFF_TAU = 1e-1
+DIFF_TAU = 1
 
 def learn(network, env,
           seed=None,
@@ -159,6 +159,7 @@ def learn(network, env,
     # pre-defined feature and lable variables
     X_feature = np.empty((0, env.observation_space.shape[0] + env.action_space.shape[0]), dtype=np.float32)
     Y_label = np.empty((0, 1), dtype=np.float32)
+    zero_points = 0
 
     for epoch in range(nb_epochs):
         for cycle in range(nb_epoch_cycles):
@@ -198,11 +199,12 @@ def learn(network, env,
                     feature = np.concatenate((obs, action), axis=-1)
                     g_hat = new_g - g
                     skip_flag = True
+                    underfitting = True
                     if np.absolute(-cost - (g_hat)) <= DELTA:
                         skip_flag = False
                     elif np.absolute(cost - (g_hat)) <= DELTA:
                         skip_flag = False
-                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.absolute(cost) <= DELTA/10):
+                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.absolute(g_hat) <= DELTA/10):
                         # delete features if they have been seen before
                         num_eliminate = 0
                         for idx, feature_i in enumerate(X_feature):
@@ -248,26 +250,28 @@ def learn(network, env,
                             agent.reset()
 
 
-            # store new data
-            agent.add_new_data(X_feature, Y_label, dataset_size=2000)
-            # clear local feature and lable
-            X_feature = np.empty((0, env.observation_space.shape[0] + env.action_space.shape[0]), dtype=np.float32)
-            Y_label = np.empty((0, 1), dtype=np.float32)
-            # dataset size
-            logger.info("Dataset size: {}".format(agent.X_feature.shape))
+            if load_actor_params is None:
+                # store new data
+                agent.add_new_data(X_feature, Y_label, dataset_size=2000)
+                # clear local feature and lable
+                X_feature = np.empty((0, env.observation_space.shape[0] + env.action_space.shape[0]), dtype=np.float32)
+                Y_label = np.empty((0, 1), dtype=np.float32)
+                # dataset size
+                logger.info("Dataset size: {}".format(agent.X_feature.shape))
 
-            # Update GP hyperparameters
-            old_log_likelihood = -np.inf
-            diff_log_likelihood = np.inf
-            iters = 0
-            while diff_log_likelihood > DIFF_TAU or iters < 10:
-                log_likelihood = agent.gp_optimization()
-                if log_likelihood is None:
-                    break
-                diff_log_likelihood = np.exp(log_likelihood) - np.exp(old_log_likelihood)
-                old_log_likelihood = log_likelihood
-                iters += 1
-            logger.info("Optimize GP hyperparameters for {} iterations.".format(iters))
+                # Update GP hyperparameters
+                old_log_likelihood = -np.inf
+                diff_log_likelihood = np.inf
+                iters = 0
+                acc, mse = agent.gp_validation()
+                while mse > 1e-5 and iters < 100:
+                    log_likelihood = agent.gp_optimization()
+                    if log_likelihood is None: break
+                    diff_log_likelihood = log_likelihood - old_log_likelihood
+                    if diff_log_likelihood < DIFF_TAU: break
+                    old_log_likelihood = log_likelihood
+                    iters += 1
+                logger.info("Optimize GP hyperparameters for {} iterations.".format(iters))
 
             # Train.
             epoch_actor_losses = []

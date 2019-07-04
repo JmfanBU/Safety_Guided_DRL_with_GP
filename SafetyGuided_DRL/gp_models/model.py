@@ -200,3 +200,9 @@ class GPModel(Model):
         # Construct confidence intervals
         f_cinterval = beta * tf.sqrt(fvar, name='standard_deviation')
         return fmean, f_cinterval
+
+    def test_function(self, Xnew):
+        pred_f_mean, pred_f_var, beta = self._build_predict_test(Xnew)
+        fmean, fvar = self.likelihood.predict_mean_and_var(pred_f_mean, pred_f_var)
+        f_cinterval = beta * tf.sqrt(fvar, name='standard_deviation')
+        return fmean, f_cinterval

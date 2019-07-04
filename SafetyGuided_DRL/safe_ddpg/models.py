@@ -50,7 +50,8 @@ class Critic(Model):
             x = self.network_builder(x)
             x = tf.layers.dense(x, 1, kernel_initializer=tf.random_uniform_initializer(minval=-3e-3, maxval=3e-3), name='output')
             if mean is not None and cinterval is not None and mu is not None:
-                x = x + mu * tf.log(tf.clip_by_value(mean - cinterval, 1e-10, 1.0)) + tf.exp(mean + cinterval)
+                x = x + mu * tf.log(tf.clip_by_value(mean - cinterval, 1e-10, 1.0)) + 0.1 * tf.exp(-tf.square(mean - cinterval))
+                # x = x - mu * tf.nn.relu(-mean + cinterval) + mu * tf.exp(-tf.square(mean - cinterval))
         return x
 
     @property

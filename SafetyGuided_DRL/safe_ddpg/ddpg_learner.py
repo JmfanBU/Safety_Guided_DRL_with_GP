@@ -75,7 +75,7 @@ class DDPG(object):
     def __init__(self, actor, critic, guard, memory, observation_shape, action_shape, param_noise=None, action_noise=None,
         gamma=0.99, tau=0.001, normalize_returns=False, enable_popart=False, normalize_observations=True,
         batch_size=128, observation_range=(-5., 5.), action_range=(-1., 1.), return_range=(-np.inf, np.inf), safety_return_range=(-np.inf, np.inf),
-        critic_l2_reg=0., actor_lr=1e-4, critic_lr=1e-3, guard_lr=1e-2, clip_norm=None, reward_scale=1., noise_delta=0.1, max_action=None):
+        critic_l2_reg=0., actor_lr=1e-4, critic_lr=1e-3, guard_lr=1e-3, clip_norm=None, reward_scale=1., noise_delta=0.1, max_action=None):
         # Inputs.
         self.obs0 = tf.placeholder(tf.float32, shape=(None,) + observation_shape, name='obs0')
         self.obs1 = tf.placeholder(tf.float32, shape=(None,) + observation_shape, name='obs1')
@@ -89,6 +89,7 @@ class DDPG(object):
         self.mu = tf.placeholder(tf.float32, name='barrier_coefficient')
         self.X = tf.placeholder(tf.float32, shape=(None, observation_shape[0]+action_shape[0]), name='gp_feature')
         self.Y = tf.placeholder(tf.float32, shape=(None, 1), name='gp_label')
+        self.obs_shape = observation_shape
 
         # Parameters.
         self.gamma = gamma
@@ -163,6 +164,8 @@ class DDPG(object):
             self.mean, self.cinterval = self.gp.build_evaluation(
                 tf.concat([self.obs0, self.actions], axis=-1))
             self.mean_with_actor_tf, self.cinterval_with_actor_tf = self.gp.build_evaluation(
+                tf.concat([self.obs0, self.actor_tf], axis=-1))
+            self.test_var, self.test_beta = self.gp.test_function(
                 tf.concat([self.obs0, self.actor_tf], axis=-1))
             self.log_likelihood = self.gp.likelihood_tensor
             self.cov_K = self.kernel.K(self.X)
@@ -446,7 +449,7 @@ class DDPG(object):
             })
 
         # Get all gradients and perform a synced update.
-        ops = [self.actor_grads, self.actor_loss, self.critic_grads, self.critic_loss, self.guard_grads, self.guard_loss]
+        ops = [self.actor_grads, self.actor_loss, self.critic_grads, self.critic_loss, self.guard_grads, self.guard_loss, self.test_var, self.test_beta]
         feed_dict={
             self.obs0: batch['obs0'],
             self.actions: batch['actions'],
@@ -456,8 +459,11 @@ class DDPG(object):
             self.Y: self.Y_label,
             self.mu: self.mu_value
         }
-        actor_grads, actor_loss, critic_grads, critic_loss, guard_grads, guard_loss = self.sess.run(ops, feed_dict=feed_dict)
+        actor_grads, actor_loss, critic_grads, critic_loss, guard_grads, guard_loss, mean, cinterval = self.sess.run(ops, feed_dict=feed_dict)
         if np.isnan(actor_grads).any():
+            print("B: {} \n; gamma_n: {}".format(mean, cinterval))
+            raise ValueError("stop for debugging.")
+            print("lower bound: {}".format(mean-cinterval))
             logger.info("Approach the safety boundary with gradient {}.".format(actor_grads))
             actor_grads[np.isnan(actor_grads)] = 0.0
         self.actor_optimizer.update(actor_grads, stepsize=self.actor_lr)
@@ -593,3 +599,16 @@ class DDPG(object):
 
             min_id = np.where(scores == scores.min())[0]
             self.eliminate_data_point(min_id[-1])
+
+    def gp_validation(self):
+        feed_dict = {self.obs0: self.X_feature[:,:self.obs_shape[0]],
+                     self.actions: self.X_feature[:,self.obs_shape[0]:],
+                     self.X: self.X_feature,
+                     self.Y: self.Y_label}
+        #feed_dict.update(self.gp.update_feed_dict())
+        fmean = self.sess.run(self.mean, feed_dict=feed_dict)
+        error = (fmean - self.Y_label) ** 2
+        accuracy = np.sum(error < 1e-5)/ float(fmean.shape[0])
+        mse = np.mean((fmean - self.Y_label)**2)
+
+        return accuracy, mse
