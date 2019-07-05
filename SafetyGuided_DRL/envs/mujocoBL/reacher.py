@@ -1,6 +1,6 @@
 import numpy as np
 from gym import utils
-from gym.envs.mujoco import mujoco_env
+from SafetyGuided_DRL.envs.mujocoBL import mujoco_env
 
 class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
@@ -19,6 +19,12 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
+        self.viewer.cam.distance = self.model.stat.extent * 2.0         # how much you "zoom in", model.stat.extent is the max limits of the arena
+        self.viewer.cam.lookat[0] += 0.5         # x,y,z offset from the object (works if trackbodyid=-1)
+        self.viewer.cam.lookat[1] += 0.5
+        self.viewer.cam.lookat[2] += 0.5
+        self.viewer.cam.elevation = -90           # camera rotation around the axis in the plane going through the frame origin (if 0 you just see a line)
+        self.viewer.cam.azimuth = 0              # camera rotation around the camera's vertical axis
 
     def reset_model(self):
         qpos = self.np_random.uniform(low=-0.1, high=0.1, size=self.model.nq) + self.init_qpos

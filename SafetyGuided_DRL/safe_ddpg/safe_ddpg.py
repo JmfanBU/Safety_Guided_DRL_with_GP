@@ -44,6 +44,7 @@ def learn(network, env,
           nb_train_steps=50, # per epoch cycle and MPI worker,
           nb_eval_steps=100,
           batch_size=100, # per MPI worker
+          dataset_size=2000,
           tau=0.01,
           eval_env=None,
           param_noise_adaption_interval=50,
@@ -252,7 +253,7 @@ def learn(network, env,
 
             if load_actor_params is None:
                 # store new data
-                agent.add_new_data(X_feature, Y_label, dataset_size=2000)
+                agent.add_new_data(X_feature, Y_label, dataset_size=dataset_size)
                 # clear local feature and lable
                 X_feature = np.empty((0, env.observation_space.shape[0] + env.action_space.shape[0]), dtype=np.float32)
                 Y_label = np.empty((0, 1), dtype=np.float32)

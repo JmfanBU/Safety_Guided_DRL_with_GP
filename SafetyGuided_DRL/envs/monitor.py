@@ -245,7 +245,7 @@ class Monitor(Wrapper):
 class SafeMonitor(Wrapper):
     def __init__(self, env, directory, video_callable=None, force=False, resume=False,
                  write_upon_reset=False, uid=None, mode=None):
-        super(Monitor, self).__init__(env)
+        super(SafeMonitor, self).__init__(env)
 
         self.videos = []
 
@@ -274,7 +274,7 @@ class SafeMonitor(Wrapper):
         return observation
 
     def close(self):
-        super(Monitor, self)._close()
+        super(SafeMonitor, self)._close()
 
         # _monitor will not be set if super(Monitor, self).__init__ raises, this check prevents a confusing error message
         if getattr(self, '_monitor', None):

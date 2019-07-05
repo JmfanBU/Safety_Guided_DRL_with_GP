@@ -385,7 +385,7 @@ class DDPG(object):
             assert noise.shape == action[0].shape
             action += noise
 
-        if np.isnan(action):
+        if np.isnan(action).any():
             raise ValueError("action is None and obs: {}".format(obs))
         action = np.clip(action, self.action_range[0], self.action_range[1])
 
