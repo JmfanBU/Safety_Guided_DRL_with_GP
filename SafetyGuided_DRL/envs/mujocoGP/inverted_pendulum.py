@@ -16,8 +16,12 @@ class InvertedPendulumEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         # Safety cost
         cost = -100 * ob[0]**2
-        return ob, reward, cost, done, {}
-
+        # Detect unsafe behavior
+        if np.abs(ob[0]) > 1:
+            unsafe_behavior = 1
+        else:
+            unsafe_behavior = 0
+        return ob, reward, cost, done, dict(violation=unsafe_behavior)
     def reset_model(self):
         qpos = self.init_qpos + self.np_random.uniform(size=self.model.nq, low=-0.1, high=0.1)
         qvel = self.init_qvel + self.np_random.uniform(size=self.model.nv, low=-0.01, high=0.01)

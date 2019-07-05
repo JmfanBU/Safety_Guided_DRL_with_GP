@@ -14,11 +14,18 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         reward_ctrl = - np.square(a).sum()
         reward = reward_dist + reward_ctrl
         ob_now = self._get_obs()
+
+        # Safety cost
         cost = - 0.1 * (pi_2_pi(math.atan2(ob_now[2], ob_now[0])) ** 2 + pi_2_pi(math.atan2(ob_now[3], ob_now[1])) ** 2 )
+        # Detect unsafe behavior
+        if cost < - 0.8:
+            unsafe_behavior = 1
+        else:
+            unsafe_behavior = 0
         self.do_simulation(a, self.frame_skip)
         ob = self._get_obs()
         done = False
-        return ob, reward, cost, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl)
+        return ob, reward, cost, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl, violation=unsafe_behavior)
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 0
