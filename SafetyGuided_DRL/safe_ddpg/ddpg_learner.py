@@ -116,7 +116,7 @@ class DDPG(object):
         self.stats_sample = None
         self.critic_l2_reg = critic_l2_reg
         self.guard_l2_reg = critic_l2_reg
-        self.mu_value = 1e-3
+        self.mu_value = 1.
         self.min_sigular_value = np.inf
 
         # Observation normalization.

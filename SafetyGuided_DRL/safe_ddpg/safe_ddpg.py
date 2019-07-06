@@ -205,7 +205,7 @@ def learn(network, env,
                         skip_flag = False
                     elif np.absolute(cost - (g_hat)) <= DELTA:
                         skip_flag = False
-                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.absolute(g_hat) <= DELTA/10):
+                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.abs(g_hat) < 1e-4):
                         # delete features if they have been seen before
                         num_eliminate = 0
                         for idx, feature_i in enumerate(X_feature):
@@ -279,14 +279,15 @@ def learn(network, env,
             epoch_critic_losses = []
             epoch_guard_losses = []
             epoch_adaptive_distances = []
-            agent.mu_value *= 0.1
-            agent.mu_value = max(agent.mu_value, 1e-10)
+            agent.mu_value = 1.
+
             for t_train in range(nb_train_steps):
                 # Adapt param noise, if necessary.
                 if memory.nb_entries >= batch_size and t_train % param_noise_adaption_interval == 0:
                     distance = agent.adapt_param_noise()
                     epoch_adaptive_distances.append(distance)
-
+                agent.mu_value *= 1.2
+                agent.mu_value = min(agent.mu_value, 1e4)
                 cl, al, gl = agent.train()
                 epoch_critic_losses.append(cl)
                 epoch_guard_losses.append(gl)

@@ -37,485 +37,485 @@ setting up target updates ...
   target_guard/output/kernel:0 <- guard/output/kernel:0
   target_guard/output/bias:0 <- guard/output/bias:0
 Using agent with the following configuration:
-dict_items([('obs0', <tf.Tensor 'obs0:0' shape=(?, 4) dtype=float32>), ('obs1', <tf.Tensor 'obs1:0' shape=(?, 4) dtype=float32>), ('terminals1', <tf.Tensor 'terminals1:0' shape=(?, 1) dtype=float32>), ('rewards', <tf.Tensor 'rewards:0' shape=(?, 1) dtype=float32>), ('costs', <tf.Tensor 'costs:0' shape=(?, 1) dtype=float32>), ('actions', <tf.Tensor 'actions:0' shape=(?, 1) dtype=float32>), ('critic_target', <tf.Tensor 'critic_target:0' shape=(?, 1) dtype=float32>), ('guard_target', <tf.Tensor 'guard_target:0' shape=(?, 1) dtype=float32>), ('param_noise_stddev', <tf.Tensor 'param_noise_stddev:0' shape=() dtype=float32>), ('mu', <tf.Tensor 'barrier_coefficient:0' shape=<unknown> dtype=float32>), ('X', <tf.Tensor 'gp_feature:0' shape=(?, 5) dtype=float32>), ('Y', <tf.Tensor 'gp_label:0' shape=(?, 1) dtype=float32>), ('obs_shape', (4,)), ('gamma', 0.99), ('tau', 0.01), ('memory', <SafetyGuided_DRL.safe_ddpg.memory.Memory object at 0x7f13b8b38ac8>), ('normalize_observations', True), ('normalize_returns', False), ('action_noise', None), ('param_noise', None), ('action_range', (-1.0, 1.0)), ('return_range', (-inf, inf)), ('safety_return_range', (-inf, inf)), ('observation_range', (-5.0, 5.0)), ('critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f145694b6d8>), ('guard', <SafetyGuided_DRL.safe_ddpg.models.Guard object at 0x7f145694b710>), ('actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f145694b748>), ('actor_lr', 0.0001), ('critic_lr', 0.001), ('guard_lr', 0.1), ('clip_norm', None), ('enable_popart', False), ('reward_scale', 1.0), ('batch_size', 100), ('stats_sample', None), ('critic_l2_reg', 0.01), ('guard_l2_reg', 0.01), ('mu_value', 0.001), ('min_sigular_value', inf), ('obs_rms', <baselines.common.mpi_running_mean_std.RunningMeanStd object at 0x7f14568e45c0>), ('ret_rms', None), ('safety_ret_rms', None), ('target_actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f14568fca90>), ('target_critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f145694bf60>), ('target_guard', <SafetyGuided_DRL.safe_ddpg.models.Guard object at 0x7f145694b780>), ('actor_tf', <tf.Tensor 'actor/Tanh:0' shape=(?, 1) dtype=float32>), ('kernel', <SafetyGuided_DRL.gp_models.regularized_rbf.RBF_regularized object at 0x7f1456896cf8>), ('gp', <SafetyGuided_DRL.gp_models.gpr.GPR object at 0x7f1456896cc0>), ('mean', <tf.Tensor 'Identity:0' shape=(?, 1) dtype=float32>), ('cinterval', <tf.Tensor 'mul:0' shape=(?, ?) dtype=float32>), ('mean_with_actor_tf', <tf.Tensor 'Identity_1:0' shape=(?, 1) dtype=float32>), ('cinterval_with_actor_tf', <tf.Tensor 'mul_1:0' shape=(?, ?) dtype=float32>), ('test_var', <tf.Tensor 'Identity_2:0' shape=(?, 1) dtype=float32>), ('test_beta', <tf.Tensor 'mul_2:0' shape=(?, ?) dtype=float32>), ('log_likelihood', <tf.Tensor 'GPR-49e2b3c5-8/likelihood_1/Sum_4:0' shape=() dtype=float32>), ('cov_K', <tf.Tensor 'mul_8:0' shape=(?, ?) dtype=float32>), ('inv_K', <tf.Tensor 'MatrixInverse:0' shape=(?, ?) dtype=float32>), ('X_feature', array([], shape=(0, 5), dtype=float32)), ('Y_label', array([], shape=(0, 1), dtype=float32)), ('normalized_critic_tf', <tf.Tensor 'critic/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_tf', <tf.Tensor 'clip_by_value_2:0' shape=(?, 1) dtype=float32>), ('normalized_critic_with_actor_tf', <tf.Tensor 'critic_1/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_with_actor_tf', <tf.Tensor 'clip_by_value_3:0' shape=(?, 1) dtype=float32>), ('normalized_critic_with_actor_tf_gp', <tf.Tensor 'critic_2/add_1:0' shape=<unknown> dtype=float32>), ('critic_with_actor_tf_gp', <tf.Tensor 'clip_by_value_4:0' shape=<unknown> dtype=float32>), ('target_Q', <tf.Tensor 'add_8:0' shape=(?, 1) dtype=float32>), ('normalized_guard_tf', <tf.Tensor 'guard/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('guard_tf', <tf.Tensor 'clip_by_value_5:0' shape=(?, 1) dtype=float32>), ('normalized_guard_with_actor_tf', <tf.Tensor 'guard_1/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('guard_with_actor_tf', <tf.Tensor 'clip_by_value_6:0' shape=(?, 1) dtype=float32>), ('target_G', <tf.Tensor 'add_9:0' shape=(?, 1) dtype=float32>), ('actor_loss', <tf.Tensor 'Neg_2:0' shape=() dtype=float32>), ('actor_grads', <tf.Tensor 'concat_3:0' shape=(162801,) dtype=float32>), ('actor_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f13b40fd208>), ('critic_loss', <tf.Tensor 'add_10:0' shape=() dtype=float32>), ('critic_grads', <tf.Tensor 'concat_5:0' shape=(163201,) dtype=float32>), ('critic_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f13b4e6ddd8>), ('guard_loss', <tf.Tensor 'add_11:0' shape=() dtype=float32>), ('guard_grads', <tf.Tensor 'concat_7:0' shape=(163201,) dtype=float32>), ('guard_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f13a01cec18>), ('gp_optimizer', <tf.Operation 'Adagrad' type=NoOp>), ('stats_ops', [<tf.Tensor 'Mean_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_4:0' shape=() dtype=float32>, <tf.Tensor 'Mean_5:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt:0' shape=() dtype=float32>, <tf.Tensor 'Mean_8:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_1:0' shape=() dtype=float32>, <tf.Tensor 'Mean_11:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_2:0' shape=() dtype=float32>, <tf.Tensor 'Mean_14:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_17:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_4:0' shape=() dtype=float32>]), ('stats_names', ['obs_rms_mean', 'obs_rms_std', 'reference_Q_mean', 'reference_Q_std', 'reference_actor_Q_mean', 'reference_actor_Q_std', 'reference_action_mean', 'reference_action_std', 'reference_G_mean', 'reference_G_std', 'reference_actor_G_mean', 'reference_actor_G_std']), ('target_init_updates', [<tf.Operation 'group_deps_3' type=NoOp>, <tf.Operation 'group_deps_5' type=NoOp>, <tf.Operation 'group_deps_7' type=NoOp>]), ('target_soft_updates', [<tf.Operation 'group_deps_4' type=NoOp>, <tf.Operation 'group_deps_6' type=NoOp>, <tf.Operation 'group_deps_8' type=NoOp>]), ('initial_state', None)])
+dict_items([('obs0', <tf.Tensor 'obs0:0' shape=(?, 4) dtype=float32>), ('obs1', <tf.Tensor 'obs1:0' shape=(?, 4) dtype=float32>), ('terminals1', <tf.Tensor 'terminals1:0' shape=(?, 1) dtype=float32>), ('rewards', <tf.Tensor 'rewards:0' shape=(?, 1) dtype=float32>), ('costs', <tf.Tensor 'costs:0' shape=(?, 1) dtype=float32>), ('actions', <tf.Tensor 'actions:0' shape=(?, 1) dtype=float32>), ('critic_target', <tf.Tensor 'critic_target:0' shape=(?, 1) dtype=float32>), ('guard_target', <tf.Tensor 'guard_target:0' shape=(?, 1) dtype=float32>), ('param_noise_stddev', <tf.Tensor 'param_noise_stddev:0' shape=() dtype=float32>), ('mu', <tf.Tensor 'barrier_coefficient:0' shape=<unknown> dtype=float32>), ('X', <tf.Tensor 'gp_feature:0' shape=(?, 5) dtype=float32>), ('Y', <tf.Tensor 'gp_label:0' shape=(?, 1) dtype=float32>), ('obs_shape', (4,)), ('gamma', 0.99), ('tau', 0.01), ('memory', <SafetyGuided_DRL.safe_ddpg.memory.Memory object at 0x7f3dd7cbdb70>), ('normalize_observations', True), ('normalize_returns', False), ('action_noise', None), ('param_noise', None), ('action_range', (-1.0, 1.0)), ('return_range', (-inf, inf)), ('safety_return_range', (-inf, inf)), ('observation_range', (-5.0, 5.0)), ('critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f3e762f5780>), ('guard', <SafetyGuided_DRL.safe_ddpg.models.Guard object at 0x7f3e762f57b8>), ('actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f3e762f57f0>), ('actor_lr', 0.001), ('critic_lr', 0.001), ('guard_lr', 0.1), ('clip_norm', None), ('enable_popart', False), ('reward_scale', 1.0), ('batch_size', 100), ('stats_sample', None), ('critic_l2_reg', 0.01), ('guard_l2_reg', 0.01), ('mu_value', 1.0), ('min_sigular_value', inf), ('obs_rms', <baselines.common.mpi_running_mean_std.RunningMeanStd object at 0x7f3e7628f668>), ('ret_rms', None), ('safety_ret_rms', None), ('target_actor', <SafetyGuided_DRL.safe_ddpg.models.Actor object at 0x7f3e762a3b38>), ('target_critic', <SafetyGuided_DRL.safe_ddpg.models.Critic object at 0x7f3e762f5b70>), ('target_guard', <SafetyGuided_DRL.safe_ddpg.models.Guard object at 0x7f3e762f5b00>), ('actor_tf', <tf.Tensor 'actor/Tanh:0' shape=(?, 1) dtype=float32>), ('kernel', <SafetyGuided_DRL.gp_models.regularized_rbf.RBF_regularized object at 0x7f3e76241da0>), ('gp', <SafetyGuided_DRL.gp_models.gpr.GPR object at 0x7f3e7625df60>), ('mean', <tf.Tensor 'Identity:0' shape=(?, 1) dtype=float32>), ('cinterval', <tf.Tensor 'mul:0' shape=(?, ?) dtype=float32>), ('mean_with_actor_tf', <tf.Tensor 'Identity_1:0' shape=(?, 1) dtype=float32>), ('cinterval_with_actor_tf', <tf.Tensor 'mul_1:0' shape=(?, ?) dtype=float32>), ('test_var', <tf.Tensor 'Identity_2:0' shape=(?, 1) dtype=float32>), ('test_beta', <tf.Tensor 'mul_2:0' shape=(?, ?) dtype=float32>), ('log_likelihood', <tf.Tensor 'GPR-6bc22f86-8/likelihood_1/Sum_4:0' shape=() dtype=float32>), ('cov_K', <tf.Tensor 'mul_8:0' shape=(?, ?) dtype=float32>), ('inv_K', <tf.Tensor 'MatrixInverse:0' shape=(?, ?) dtype=float32>), ('X_feature', array([], shape=(0, 5), dtype=float32)), ('Y_label', array([], shape=(0, 1), dtype=float32)), ('normalized_critic_tf', <tf.Tensor 'critic/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_tf', <tf.Tensor 'clip_by_value_2:0' shape=(?, 1) dtype=float32>), ('normalized_critic_with_actor_tf', <tf.Tensor 'critic_1/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('critic_with_actor_tf', <tf.Tensor 'clip_by_value_3:0' shape=(?, 1) dtype=float32>), ('normalized_critic_with_actor_tf_gp', <tf.Tensor 'critic_2/add_1:0' shape=(?, ?) dtype=float32>), ('critic_with_actor_tf_gp', <tf.Tensor 'clip_by_value_4:0' shape=(?, ?) dtype=float32>), ('target_Q', <tf.Tensor 'add_8:0' shape=(?, 1) dtype=float32>), ('normalized_guard_tf', <tf.Tensor 'guard/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('guard_tf', <tf.Tensor 'clip_by_value_5:0' shape=(?, 1) dtype=float32>), ('normalized_guard_with_actor_tf', <tf.Tensor 'guard_1/output/BiasAdd:0' shape=(?, 1) dtype=float32>), ('guard_with_actor_tf', <tf.Tensor 'clip_by_value_6:0' shape=(?, 1) dtype=float32>), ('target_G', <tf.Tensor 'add_9:0' shape=(?, 1) dtype=float32>), ('actor_loss', <tf.Tensor 'Neg_2:0' shape=() dtype=float32>), ('actor_grads', <tf.Tensor 'concat_3:0' shape=(162801,) dtype=float32>), ('actor_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f3dd407bc50>), ('critic_loss', <tf.Tensor 'add_10:0' shape=() dtype=float32>), ('critic_grads', <tf.Tensor 'concat_5:0' shape=(163201,) dtype=float32>), ('critic_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f3dd40bba90>), ('guard_loss', <tf.Tensor 'add_11:0' shape=() dtype=float32>), ('guard_grads', <tf.Tensor 'concat_7:0' shape=(163201,) dtype=float32>), ('guard_optimizer', <baselines.common.mpi_adam.MpiAdam object at 0x7f3dc0184160>), ('gp_optimizer', <tf.Operation 'Adagrad' type=NoOp>), ('stats_ops', [<tf.Tensor 'Mean_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_4:0' shape=() dtype=float32>, <tf.Tensor 'Mean_5:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt:0' shape=() dtype=float32>, <tf.Tensor 'Mean_8:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_1:0' shape=() dtype=float32>, <tf.Tensor 'Mean_11:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_2:0' shape=() dtype=float32>, <tf.Tensor 'Mean_14:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_3:0' shape=() dtype=float32>, <tf.Tensor 'Mean_17:0' shape=() dtype=float32>, <tf.Tensor 'Sqrt_4:0' shape=() dtype=float32>]), ('stats_names', ['obs_rms_mean', 'obs_rms_std', 'reference_Q_mean', 'reference_Q_std', 'reference_actor_Q_mean', 'reference_actor_Q_std', 'reference_action_mean', 'reference_action_std', 'reference_G_mean', 'reference_G_std', 'reference_actor_G_mean', 'reference_actor_G_std']), ('target_init_updates', [<tf.Operation 'group_deps_3' type=NoOp>, <tf.Operation 'group_deps_5' type=NoOp>, <tf.Operation 'group_deps_7' type=NoOp>]), ('target_soft_updates', [<tf.Operation 'group_deps_4' type=NoOp>, <tf.Operation 'group_deps_6' type=NoOp>, <tf.Operation 'group_deps_8' type=NoOp>]), ('initial_state', None)])
 Starting from scratch
-Minimum singular value: 0.05008728429675102
+Minimum singular value: 0.050542060285806656
 Dataset size: (39, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04944690689444542
-Dataset size: (123, 5)
+Minimum singular value: 0.050364285707473755
+Dataset size: (32, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.049262963235378265
-Dataset size: (278, 5)
+Minimum singular value: 0.0512363500893116
+Dataset size: (21, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04923363775014877
-Dataset size: (356, 5)
+Minimum singular value: 0.05041058734059334
+Dataset size: (31, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04922517016530037
-Dataset size: (399, 5)
+Minimum singular value: 0.050225842744112015
+Dataset size: (43, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04920358210802078
-Dataset size: (417, 5)
+Minimum singular value: 0.0500519759953022
+Dataset size: (42, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04909588769078255
-Dataset size: (398, 5)
+Minimum singular value: 0.04988153651356697
+Dataset size: (40, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04893692582845688
-Dataset size: (535, 5)
+Minimum singular value: 0.05049974471330643
+Dataset size: (37, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04893159866333008
-Dataset size: (576, 5)
+Minimum singular value: 0.04980397969484329
+Dataset size: (52, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048923928290605545
-Dataset size: (606, 5)
+Minimum singular value: 0.049799300730228424
+Dataset size: (45, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.0489070750772953
-Dataset size: (664, 5)
+Minimum singular value: 0.05011720955371857
+Dataset size: (39, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.0488969162106514
-Dataset size: (741, 5)
+Minimum singular value: 0.05197592079639435
+Dataset size: (23, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04888847842812538
-Dataset size: (800, 5)
+Minimum singular value: 0.05034256726503372
+Dataset size: (42, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04888177290558815
-Dataset size: (851, 5)
+Minimum singular value: 0.04990001767873764
+Dataset size: (43, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048878028988838196
-Dataset size: (907, 5)
+Minimum singular value: 0.04993467777967453
+Dataset size: (48, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04887591674923897
-Dataset size: (929, 5)
+Minimum singular value: 0.049886297434568405
+Dataset size: (43, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04887421056628227
-Dataset size: (966, 5)
+Minimum singular value: 0.05000075325369835
+Dataset size: (40, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04887762293219566
-Dataset size: (1002, 5)
+Minimum singular value: 0.05044678598642349
+Dataset size: (37, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04887300357222557
-Dataset size: (1037, 5)
+Minimum singular value: 0.05026722326874733
+Dataset size: (48, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04886630177497864
-Dataset size: (1043, 5)
+Minimum singular value: 0.05021221190690994
+Dataset size: (35, 5)
 Optimize GP hyperparameters for 0 iterations.
 -----------------------------------------
 | obs_rms_mean               | 0        |
 | obs_rms_std                | 1        |
-| reference_action_mean      | 0.0252   |
-| reference_action_std       | 0.207    |
-| reference_actor_G_mean     | -7.21    |
+| reference_action_mean      | 0.000142 |
+| reference_action_std       | 4.81e-05 |
+| reference_actor_G_mean     | -1.64    |
 | reference_actor_G_std      | 0        |
-| reference_actor_Q_mean     | 4.24     |
-| reference_actor_Q_std      | 1.98     |
-| reference_G_mean           | -7.21    |
+| reference_actor_Q_mean     | 4.14     |
+| reference_actor_Q_std      | 1.91     |
+| reference_G_mean           | -1.64    |
 | reference_G_std            | 0        |
-| reference_Q_mean           | 3.44     |
-| reference_Q_std            | 1.87     |
-| rollout/actions_mean       | -0.0287  |
-| rollout/actions_std        | 0.377    |
-| rollout/episode_steps      | 4.21     |
-| rollout/episodes           | 4.75e+03 |
-| rollout/G_mean             | -3.53    |
-| rollout/Q_mean             | 2.58     |
-| rollout/return             | 4.21     |
-| rollout/return_history     | 8.38     |
-| rollout/return_history_std | 7.36     |
-| rollout/return_std         | 4.5      |
-| rollout/safety_return      | -11.9    |
-| rollout/safety_return_std  | 81       |
-| total/duration             | 128      |
-| total/episodes             | 4.75e+03 |
+| reference_Q_mean           | 4.14     |
+| reference_Q_std            | 1.91     |
+| rollout/actions_mean       | 0.000325 |
+| rollout/actions_std        | 0.00051  |
+| rollout/episode_steps      | 6.63     |
+| rollout/episodes           | 3.02e+03 |
+| rollout/G_mean             | -1.04    |
+| rollout/Q_mean             | 2.76     |
+| rollout/return             | 6.63     |
+| rollout/return_history     | 6.67     |
+| rollout/return_history_std | 2.93     |
+| rollout/return_std         | 2.81     |
+| rollout/safety_return      | -2.22    |
+| rollout/safety_return_std  | 2.38     |
+| total/duration             | 85.6     |
+| total/episodes             | 3.02e+03 |
 | total/epochs               | 1        |
 | total/steps                | 2e+04    |
-| total/steps_per_second     | 157      |
-| train/loss_actor           | -4.16    |
-| train/loss_critic          | 0.348    |
-| train/loss_guard           | 67.3     |
+| total/steps_per_second     | 234      |
+| train/loss_actor           | 42.7     |
+| train/loss_critic          | 0.214    |
+| train/loss_guard           | 0.419    |
 | train/param_noise_distance | 0        |
 -----------------------------------------
 
-Minimum singular value: 0.048863667994737625
-Dataset size: (1067, 5)
+Minimum singular value: 0.05077444761991501
+Dataset size: (33, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04886387288570404
-Dataset size: (1072, 5)
+Minimum singular value: 0.050715260207653046
+Dataset size: (26, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048864398151636124
-Dataset size: (1066, 5)
+Minimum singular value: 0.04956403002142906
+Dataset size: (53, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.0488579198718071
-Dataset size: (1113, 5)
+Minimum singular value: 0.050072044134140015
+Dataset size: (32, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885923117399216
-Dataset size: (1119, 5)
+Minimum singular value: 0.0503271259367466
+Dataset size: (35, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048859115689992905
-Dataset size: (1129, 5)
+Minimum singular value: 0.05007144808769226
+Dataset size: (38, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885992407798767
-Dataset size: (1127, 5)
+Minimum singular value: 0.05003294348716736
+Dataset size: (38, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885758459568024
-Dataset size: (1128, 5)
+Minimum singular value: 0.049951065331697464
+Dataset size: (32, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048855219036340714
-Dataset size: (1162, 5)
+Minimum singular value: 0.04983395338058472
+Dataset size: (40, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885582998394966
-Dataset size: (1151, 5)
+Minimum singular value: 0.04998119920492172
+Dataset size: (43, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885902255773544
-Dataset size: (1119, 5)
+Minimum singular value: 0.050010550767183304
+Dataset size: (44, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885934665799141
-Dataset size: (1109, 5)
+Minimum singular value: 0.05032099410891533
+Dataset size: (37, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885733127593994
-Dataset size: (1120, 5)
+Minimum singular value: 0.04994075745344162
+Dataset size: (40, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885699227452278
-Dataset size: (1122, 5)
+Minimum singular value: 0.04971027374267578
+Dataset size: (42, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885542020201683
-Dataset size: (1129, 5)
+Minimum singular value: 0.05000011622905731
+Dataset size: (47, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885545372962952
-Dataset size: (1119, 5)
+Minimum singular value: 0.04993819072842598
+Dataset size: (41, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885513335466385
-Dataset size: (1134, 5)
+Minimum singular value: 0.049980394542217255
+Dataset size: (37, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04885292798280716
-Dataset size: (1142, 5)
+Minimum singular value: 0.050333715975284576
+Dataset size: (33, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048852115869522095
-Dataset size: (1147, 5)
+Minimum singular value: 0.05011339485645294
+Dataset size: (33, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896752297878265
-Dataset size: (1149, 5)
+Minimum singular value: 0.04993584379553795
+Dataset size: (44, 5)
 Optimize GP hyperparameters for 0 iterations.
 -----------------------------------------
 | obs_rms_mean               | 0        |
 | obs_rms_std                | 1        |
-| reference_action_mean      | 0.0201   |
-| reference_action_std       | 0.2      |
-| reference_actor_G_mean     | -61      |
-| reference_actor_G_std      | 3.81e-06 |
-| reference_actor_Q_mean     | 11.3     |
-| reference_actor_Q_std      | 4.65     |
-| reference_G_mean           | -61      |
-| reference_G_std            | 3.81e-06 |
-| reference_Q_mean           | 8.02     |
-| reference_Q_std            | 5.33     |
-| rollout/actions_mean       | -0.0233  |
-| rollout/actions_std        | 0.271    |
-| rollout/episode_steps      | 7.69     |
-| rollout/episodes           | 5.2e+03  |
-| rollout/G_mean             | -17.5    |
-| rollout/Q_mean             | 5.77     |
-| rollout/return             | 7.69     |
-| rollout/return_history     | 25.4     |
-| rollout/return_history_std | 23.8     |
-| rollout/return_std         | 13.7     |
-| rollout/safety_return      | -107     |
-| rollout/safety_return_std  | 355      |
-| total/duration             | 274      |
-| total/episodes             | 5.2e+03  |
+| reference_action_mean      | -0.00109 |
+| reference_action_std       | 0.000378 |
+| reference_actor_G_mean     | -1.99    |
+| reference_actor_G_std      | 1.19e-07 |
+| reference_actor_Q_mean     | 4.43     |
+| reference_actor_Q_std      | 2.39     |
+| reference_G_mean           | -1.99    |
+| reference_G_std            | 1.19e-07 |
+| reference_Q_mean           | 4.43     |
+| reference_Q_std            | 2.39     |
+| rollout/actions_mean       | 4.91e-05 |
+| rollout/actions_std        | 0.000527 |
+| rollout/episode_steps      | 6.57     |
+| rollout/episodes           | 6.08e+03 |
+| rollout/G_mean             | -1.47    |
+| rollout/Q_mean             | 3.37     |
+| rollout/return             | 6.57     |
+| rollout/return_history     | 6.57     |
+| rollout/return_history_std | 2.76     |
+| rollout/return_std         | 2.77     |
+| rollout/safety_return      | -2.19    |
+| rollout/safety_return_std  | 2.35     |
+| total/duration             | 177      |
+| total/episodes             | 6.08e+03 |
 | total/epochs               | 2        |
 | total/steps                | 4e+04    |
-| total/steps_per_second     | 146      |
-| train/loss_actor           | -11.7    |
-| train/loss_critic          | 0.58     |
-| train/loss_guard           | 1.03e+03 |
+| total/steps_per_second     | 225      |
+| train/loss_actor           | 41.8     |
+| train/loss_critic          | 0.281    |
+| train/loss_guard           | 0.612    |
 | train/param_noise_distance | 0        |
 -----------------------------------------
 
-Minimum singular value: 0.04889503866434097
-Dataset size: (1158, 5)
+Minimum singular value: 0.05006217584013939
+Dataset size: (47, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048893362283706665
-Dataset size: (1173, 5)
+Minimum singular value: 0.05081498622894287
+Dataset size: (35, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889201745390892
-Dataset size: (1185, 5)
+Minimum singular value: 0.050382349640131
+Dataset size: (44, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889201745390892
-Dataset size: (1185, 5)
+Minimum singular value: 0.05034036561846733
+Dataset size: (42, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048893362283706665
-Dataset size: (1163, 5)
+Minimum singular value: 0.05001719295978546
+Dataset size: (54, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889330640435219
-Dataset size: (1164, 5)
+Minimum singular value: 0.0500975139439106
+Dataset size: (48, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048891931772232056
-Dataset size: (1185, 5)
+Minimum singular value: 0.05057023838162422
+Dataset size: (32, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889189079403877
-Dataset size: (1187, 5)
+Minimum singular value: 0.05016015097498894
+Dataset size: (53, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889382794499397
-Dataset size: (1179, 5)
+Minimum singular value: 0.049917690455913544
+Dataset size: (64, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889379441738129
-Dataset size: (1179, 5)
+Minimum singular value: 0.04982879012823105
+Dataset size: (66, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894014209508896
-Dataset size: (1179, 5)
+Minimum singular value: 0.04960048198699951
+Dataset size: (94, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894252628088
-Dataset size: (1175, 5)
+Minimum singular value: 0.049222782254219055
+Dataset size: (116, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894237726926804
-Dataset size: (1175, 5)
+Minimum singular value: 0.049077801406383514
+Dataset size: (175, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894528299570084
-Dataset size: (1173, 5)
+Minimum singular value: 0.04909246787428856
+Dataset size: (220, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894815146923065
-Dataset size: (1169, 5)
+Minimum singular value: 0.04900272190570831
+Dataset size: (296, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894815146923065
-Dataset size: (1169, 5)
+Minimum singular value: 0.04899385944008827
+Dataset size: (318, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889495670795441
-Dataset size: (1168, 5)
+Minimum singular value: 0.04898101091384888
+Dataset size: (377, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896562308073044
-Dataset size: (1164, 5)
+Minimum singular value: 0.04891051724553108
+Dataset size: (505, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896562308073044
-Dataset size: (1164, 5)
+Minimum singular value: 0.04889247938990593
+Dataset size: (570, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896536231040955
-Dataset size: (1165, 5)
+Minimum singular value: 0.048881493508815765
+Dataset size: (599, 5)
 Optimize GP hyperparameters for 0 iterations.
 -----------------------------------------
 | obs_rms_mean               | 0        |
 | obs_rms_std                | 1        |
-| reference_action_mean      | 0.0238   |
-| reference_action_std       | 0.212    |
-| reference_actor_G_mean     | -180     |
-| reference_actor_G_std      | 1.53e-05 |
-| reference_actor_Q_mean     | 18.1     |
-| reference_actor_Q_std      | 7.58     |
-| reference_G_mean           | -180     |
-| reference_G_std            | 1.53e-05 |
-| reference_Q_mean           | 12.8     |
-| reference_Q_std            | 9.05     |
-| rollout/actions_mean       | -0.0164  |
-| rollout/actions_std        | 0.222    |
-| rollout/episode_steps      | 11.4     |
-| rollout/episodes           | 5.27e+03 |
-| rollout/G_mean             | -49.3    |
-| rollout/Q_mean             | 9.32     |
-| rollout/return             | 11.4     |
-| rollout/return_history     | 44.8     |
-| rollout/return_history_std | 121      |
-| rollout/return_std         | 55.4     |
-| rollout/safety_return      | -320     |
-| rollout/safety_return_std  | 3.3e+03  |
-| total/duration             | 413      |
-| total/episodes             | 5.27e+03 |
+| reference_action_mean      | 0.00561  |
+| reference_action_std       | 0.117    |
+| reference_actor_G_mean     | -4.63    |
+| reference_actor_G_std      | 4.77e-07 |
+| reference_actor_Q_mean     | 8.16     |
+| reference_actor_Q_std      | 4.34     |
+| reference_G_mean           | -4.63    |
+| reference_G_std            | 4.77e-07 |
+| reference_Q_mean           | 6.41     |
+| reference_Q_std            | 4.24     |
+| rollout/actions_mean       | -0.0017  |
+| rollout/actions_std        | 0.0143   |
+| rollout/episode_steps      | 7.08     |
+| rollout/episodes           | 8.48e+03 |
+| rollout/G_mean             | -1.79    |
+| rollout/Q_mean             | 4.11     |
+| rollout/return             | 7.08     |
+| rollout/return_history     | 10.8     |
+| rollout/return_history_std | 11.5     |
+| rollout/return_std         | 4.97     |
+| rollout/safety_return      | -11.3    |
+| rollout/safety_return_std  | 90.5     |
+| total/duration             | 277      |
+| total/episodes             | 8.48e+03 |
 | total/epochs               | 3        |
 | total/steps                | 6e+04    |
-| total/steps_per_second     | 145      |
-| train/loss_actor           | -18.9    |
-| train/loss_critic          | 1.09     |
-| train/loss_guard           | 3.44e+03 |
+| total/steps_per_second     | 217      |
+| train/loss_actor           | 36.7     |
+| train/loss_critic          | 0.563    |
+| train/loss_guard           | 54.2     |
 | train/param_noise_distance | 0        |
 -----------------------------------------
 
-Minimum singular value: 0.04889616742730141
-Dataset size: (1170, 5)
+Minimum singular value: 0.04887932911515236
+Dataset size: (612, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889604449272156
-Dataset size: (1170, 5)
+Minimum singular value: 0.048877570778131485
+Dataset size: (626, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895929008722305
-Dataset size: (1172, 5)
+Minimum singular value: 0.04887300357222557
+Dataset size: (635, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889609292149544
-Dataset size: (1171, 5)
+Minimum singular value: 0.04888034239411354
+Dataset size: (608, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048892825841903687
-Dataset size: (1179, 5)
+Minimum singular value: 0.04887891188263893
+Dataset size: (627, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894379287958145
-Dataset size: (1176, 5)
+Minimum singular value: 0.04887985438108444
+Dataset size: (630, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889407008886337
-Dataset size: (1181, 5)
+Minimum singular value: 0.04887492582201958
+Dataset size: (656, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048893872648477554
-Dataset size: (1182, 5)
+Minimum singular value: 0.04887906834483147
+Dataset size: (646, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894003033638
-Dataset size: (1177, 5)
+Minimum singular value: 0.04887678846716881
+Dataset size: (660, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889395833015442
-Dataset size: (1181, 5)
+Minimum singular value: 0.048876482993364334
+Dataset size: (668, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889383912086487
-Dataset size: (1181, 5)
+Minimum singular value: 0.04887348413467407
+Dataset size: (676, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.0488932766020298
-Dataset size: (1183, 5)
+Minimum singular value: 0.04887029156088829
+Dataset size: (716, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889301583170891
-Dataset size: (1185, 5)
+Minimum singular value: 0.04888126626610756
+Dataset size: (670, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889298230409622
-Dataset size: (1185, 5)
+Minimum singular value: 0.04888114705681801
+Dataset size: (670, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048894599080085754
-Dataset size: (1182, 5)
+Minimum singular value: 0.048876602202653885
+Dataset size: (677, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895057290792465
-Dataset size: (1179, 5)
+Minimum singular value: 0.04887897148728371
+Dataset size: (669, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896413296461105
-Dataset size: (1160, 5)
+Minimum singular value: 0.04889441654086113
+Dataset size: (614, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889609292149544
-Dataset size: (1157, 5)
+Minimum singular value: 0.04888783395290375
+Dataset size: (617, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889609292149544
-Dataset size: (1157, 5)
+Minimum singular value: 0.0488864928483963
+Dataset size: (625, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889608547091484
-Dataset size: (1157, 5)
+Minimum singular value: 0.04888409003615379
+Dataset size: (639, 5)
 Optimize GP hyperparameters for 0 iterations.
 -----------------------------------------
 | obs_rms_mean               | 0        |
 | obs_rms_std                | 1        |
-| reference_action_mean      | 0.0183   |
-| reference_action_std       | 0.216    |
-| reference_actor_G_mean     | -317     |
-| reference_actor_G_std      | 0        |
-| reference_actor_Q_mean     | 23.5     |
-| reference_actor_Q_std      | 10.3     |
-| reference_G_mean           | -317     |
-| reference_G_std            | 0        |
-| reference_Q_mean           | 16.3     |
-| reference_Q_std            | 12.2     |
-| rollout/actions_mean       | -0.0123  |
-| rollout/actions_std        | 0.192    |
-| rollout/episode_steps      | 15.1     |
-| rollout/episodes           | 5.29e+03 |
-| rollout/G_mean             | -98.8    |
-| rollout/Q_mean             | 13.2     |
-| rollout/return             | 15.1     |
-| rollout/return_history     | 64.6     |
-| rollout/return_history_std | 180      |
-| rollout/return_std         | 82.1     |
-| rollout/safety_return      | -513     |
-| rollout/safety_return_std  | 4.67e+03 |
-| total/duration             | 548      |
-| total/episodes             | 5.29e+03 |
+| reference_action_mean      | 0.0149   |
+| reference_action_std       | 0.119    |
+| reference_actor_G_mean     | -29.2    |
+| reference_actor_G_std      | 1.91e-06 |
+| reference_actor_Q_mean     | 16.5     |
+| reference_actor_Q_std      | 6.91     |
+| reference_G_mean           | -29.2    |
+| reference_G_std            | 1.91e-06 |
+| reference_Q_mean           | 14       |
+| reference_Q_std            | 7.89     |
+| rollout/actions_mean       | -0.00376 |
+| rollout/actions_std        | 0.0167   |
+| rollout/episode_steps      | 8.94     |
+| rollout/episodes           | 8.94e+03 |
+| rollout/G_mean             | -5.39    |
+| rollout/Q_mean             | 6.61     |
+| rollout/return             | 8.94     |
+| rollout/return_history     | 27.1     |
+| rollout/return_history_std | 37.2     |
+| rollout/return_std         | 14.3     |
+| rollout/safety_return      | -51.5    |
+| rollout/safety_return_std  | 207      |
+| total/duration             | 395      |
+| total/episodes             | 8.94e+03 |
 | total/epochs               | 4        |
 | total/steps                | 8e+04    |
-| total/steps_per_second     | 146      |
-| train/loss_actor           | -25.9    |
-| train/loss_critic          | 1.49     |
-| train/loss_guard           | 7.61e+03 |
+| total/steps_per_second     | 202      |
+| train/loss_actor           | 31.3     |
+| train/loss_critic          | 0.793    |
+| train/loss_guard           | 362      |
 | train/param_noise_distance | 0        |
 -----------------------------------------
 
-Minimum singular value: 0.048896562308073044
-Dataset size: (1148, 5)
+Minimum singular value: 0.0488830991089344
+Dataset size: (640, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896923661231995
-Dataset size: (1149, 5)
+Minimum singular value: 0.048882994800806046
+Dataset size: (645, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889671131968498
-Dataset size: (1147, 5)
+Minimum singular value: 0.04888290539383888
+Dataset size: (646, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048896897584199905
-Dataset size: (1144, 5)
+Minimum singular value: 0.04888306185603142
+Dataset size: (645, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889553412795067
-Dataset size: (1147, 5)
+Minimum singular value: 0.04888338968157768
+Dataset size: (641, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889553412795067
-Dataset size: (1147, 5)
+Minimum singular value: 0.04888657107949257
+Dataset size: (619, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895303159952164
-Dataset size: (1156, 5)
+Minimum singular value: 0.04888597130775452
+Dataset size: (625, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889513552188873
-Dataset size: (1157, 5)
+Minimum singular value: 0.048888664692640305
+Dataset size: (616, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895448446273804
-Dataset size: (1146, 5)
+Minimum singular value: 0.04889003559947014
+Dataset size: (589, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889534413814545
-Dataset size: (1150, 5)
+Minimum singular value: 0.04889003559947014
+Dataset size: (589, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895277082920074
-Dataset size: (1149, 5)
+Minimum singular value: 0.04888920485973358
+Dataset size: (591, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889510199427605
-Dataset size: (1143, 5)
+Minimum singular value: 0.0488886833190918
+Dataset size: (590, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895277082920074
-Dataset size: (1143, 5)
+Minimum singular value: 0.0488886833190918
+Dataset size: (590, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889529198408127
-Dataset size: (1142, 5)
+Minimum singular value: 0.04888885095715523
+Dataset size: (591, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889504984021187
-Dataset size: (1143, 5)
+Minimum singular value: 0.048890478909015656
+Dataset size: (569, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895157873630524
-Dataset size: (1144, 5)
+Minimum singular value: 0.04888851195573807
+Dataset size: (572, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895057290792465
-Dataset size: (1145, 5)
+Minimum singular value: 0.048886753618717194
+Dataset size: (577, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889512062072754
-Dataset size: (1145, 5)
+Minimum singular value: 0.048886507749557495
+Dataset size: (581, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.048895083367824554
-Dataset size: (1146, 5)
+Minimum singular value: 0.04888558387756348
+Dataset size: (586, 5)
 Optimize GP hyperparameters for 0 iterations.
-Minimum singular value: 0.04889500141143799
-Dataset size: (1145, 5)
+Minimum singular value: 0.0488852858543396
+Dataset size: (588, 5)
 Optimize GP hyperparameters for 0 iterations.
 -----------------------------------------
 | obs_rms_mean               | 0        |
 | obs_rms_std                | 1        |
-| reference_action_mean      | 0.0216   |
-| reference_action_std       | 0.223    |
-| reference_actor_G_mean     | -447     |
-| reference_actor_G_std      | 0        |
-| reference_actor_Q_mean     | 28.7     |
-| reference_actor_Q_std      | 13.4     |
-| reference_G_mean           | -447     |
-| reference_G_std            | 0        |
-| reference_Q_mean           | 19.9     |
-| reference_Q_std            | 15.4     |
-| rollout/actions_mean       | -0.00986 |
-| rollout/actions_std        | 0.172    |
-| rollout/episode_steps      | 18.8     |
-| rollout/episodes           | 5.31e+03 |
-| rollout/G_mean             | -155     |
-| rollout/Q_mean             | 17       |
-| rollout/return             | 18.8     |
-| rollout/return_history     | 84.5     |
-| rollout/return_history_std | 223      |
-| rollout/return_std         | 102      |
-| rollout/safety_return      | -673     |
-| rollout/safety_return_std  | 5.49e+03 |
-| total/duration             | 682      |
-| total/episodes             | 5.31e+03 |
+| reference_action_mean      | 0.00433  |
+| reference_action_std       | 0.125    |
+| reference_actor_G_mean     | -50.8    |
+| reference_actor_G_std      | 3.81e-06 |
+| reference_actor_Q_mean     | 22.6     |
+| reference_actor_Q_std      | 9.57     |
+| reference_G_mean           | -50.8    |
+| reference_G_std            | 3.81e-06 |
+| reference_Q_mean           | 19.4     |
+| reference_Q_std            | 11.1     |
+| rollout/actions_mean       | -0.00404 |
+| rollout/actions_std        | 0.0163   |
+| rollout/episode_steps      | 10.9     |
+| rollout/episodes           | 9.1e+03  |
+| rollout/G_mean             | -12.3    |
+| rollout/Q_mean             | 9.93     |
+| rollout/return             | 10.9     |
+| rollout/return_history     | 45       |
+| rollout/return_history_std | 116      |
+| rollout/return_std         | 40.4     |
+| rollout/safety_return      | -74.9    |
+| rollout/safety_return_std  | 482      |
+| total/duration             | 504      |
+| total/episodes             | 9.1e+03  |
 | total/epochs               | 5        |
 | total/steps                | 1e+05    |
-| total/steps_per_second     | 147      |
-| train/loss_actor           | -32.8    |
-| train/loss_critic          | 1.49     |
-| train/loss_guard           | 1.14e+04 |
+| total/steps_per_second     | 198      |
+| train/loss_actor           | 25.2     |
+| train/loss_critic          | 1.16     |
+| train/loss_guard           | 470      |
 | train/param_noise_distance | 0        |
 -----------------------------------------
 
