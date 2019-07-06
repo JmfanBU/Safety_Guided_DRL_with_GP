@@ -160,7 +160,7 @@ def learn(network, env,
     # pre-defined feature and lable variables
     X_feature = np.empty((0, env.observation_space.shape[0] + env.action_space.shape[0]), dtype=np.float32)
     Y_label = np.empty((0, 1), dtype=np.float32)
-    zero_points = 0
+    GP_optimization = True
 
     for epoch in range(nb_epochs):
         for cycle in range(nb_epoch_cycles):
@@ -205,7 +205,7 @@ def learn(network, env,
                         skip_flag = False
                     elif np.absolute(cost - (g_hat)) <= DELTA:
                         skip_flag = False
-                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.abs(g_hat) < 1e-4):
+                    if not skip_flag and (np.absolute(g_hat) >= DELTA or np.abs(g_hat) < 1e-4) and GP_optimization:
                         # delete features if they have been seen before
                         num_eliminate = 0
                         for idx, feature_i in enumerate(X_feature):
@@ -265,8 +265,10 @@ def learn(network, env,
                 diff_log_likelihood = np.inf
                 iters = 0
                 acc, mse = agent.gp_validation()
+                log_likelihood = agent.gp_optimization()
+                if mse < 1e-5 and log_likelihood is None:
+                    GP_optimization = False
                 while mse > 1e-5 and iters < 100:
-                    log_likelihood = agent.gp_optimization()
                     if log_likelihood is None: break
                     diff_log_likelihood = log_likelihood - old_log_likelihood
                     if diff_log_likelihood < DIFF_TAU: break
@@ -279,15 +281,15 @@ def learn(network, env,
             epoch_critic_losses = []
             epoch_guard_losses = []
             epoch_adaptive_distances = []
-            agent.mu_value = 1.
+            agent.mu_value = 1e-3
 
             for t_train in range(nb_train_steps):
                 # Adapt param noise, if necessary.
                 if memory.nb_entries >= batch_size and t_train % param_noise_adaption_interval == 0:
                     distance = agent.adapt_param_noise()
                     epoch_adaptive_distances.append(distance)
-                agent.mu_value *= 1.2
-                agent.mu_value = min(agent.mu_value, 1e4)
+                agent.mu_value *= 0.1
+                agent.mu_value = max(agent.mu_value, 1e-10)
                 cl, al, gl = agent.train()
                 epoch_critic_losses.append(cl)
                 epoch_guard_losses.append(gl)

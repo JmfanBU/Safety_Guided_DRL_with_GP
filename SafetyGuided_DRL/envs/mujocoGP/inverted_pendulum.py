@@ -17,7 +17,7 @@ class InvertedPendulumEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # Safety cost
         cost = -100 * ob[0]**2
         # Detect unsafe behavior
-        if np.abs(ob[0]) > 0.5:
+        if np.abs(ob[0]) > 0.7:
             unsafe_behavior = 1
         else:
             unsafe_behavior = 0
