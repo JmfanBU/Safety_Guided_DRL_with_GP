@@ -15,7 +15,7 @@ class InvertedPendulumEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         done = not notdone
 
         # Detect unsafe behavior
-        if np.abs(ob[0]) > 0.5:
+        if np.abs(ob[0]) > 0.7:
             unsafe_behavior = 1
         else:
             unsafe_behavior = 0
