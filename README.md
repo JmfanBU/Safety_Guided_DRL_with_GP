@@ -44,17 +44,17 @@ pip install -e .
 Our implementation includes two methods: vanilla DDPG and DDPG with
 online GP estimation.
 
-To train a vanilla ddpg policy, use the code in [ddpg_baseline](SafetyGuided_DRL/ddpg_baseline)
+To train a vanilla ddpg policy, use the code in [ddpg_baseline](SafetyGuided_DRL/ddpg_baseline).
 
 For DDPG using online GP, use the code in [safe_ddpg](SafetyGuided_DRL/safe_ddpg).
 
 As default, training results will be saved to [data_ddpg](SafetyGuided_DRL/data_ddpgn).
 
-We provide some samples of console outputs in [outputs](SafetyGuided_DRL/outputs)
+We also provide some samples of console outputs in [outputs](SafetyGuided_DRL/outputs).
 
 ### DDPG_with_Online_GP_Estimation
 
-An example of training DDPG with GP policy for pendulum can be found in [train](train):
+An example of training DDPG with online GP policy for pendulum can be found in [train](train):
 
 ```bash
 ./train/pendulum_0.1M_safe_ddpg.sh
