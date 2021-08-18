@@ -9,11 +9,21 @@ You can find detailed instructions for installing OpenAI Baselines <a href="http
 
 Our implementation is based on a commit [c57528573ea695b19cd03e98dae48f0082fb2b5e](https://github.com/openai/baselines/tree/c57528573ea695b19cd03e98dae48f0082fb2b5e)
 
-### GPflow
-GPflow can be installed with:
-```bash
-pip install gpflow==1.4.1
-```
+### Tensorflow and GPflow
+In our implementation, we use Tensorflow 1.12.0 and GPflow 1.4.1.
+- You can install Tensorflow via
+    ```bash
+    pip install tensorflow-gpu==1.12.0  # if you have a CUDA-compatible gpu and proper drivers
+    ```
+    or
+    ```bash
+    pip install tensorflow==1.12.0
+    ```
+
+- Install GPflow via
+    ```bash
+    pip install gpflow==1.4.1
+    ```
 
 ### MuJoCO
 Instructions on setting up MuJoCo can be found [here](https://github.com/openai/mujoco-py)
