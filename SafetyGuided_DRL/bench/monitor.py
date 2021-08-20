@@ -124,11 +124,11 @@ class SafeLogMonitor(Wrapper):
         self.allow_early_resets = allow_early_resets
         self.rewards = None
         self.costs = None
-        self.violations = None
+        # self.violations = None
         self.needs_reset = True
         self.episode_rewards = []
         self.episode_costs = []
-        self.episode_violations = []
+        # self.episode_violations = []
         self.episode_lengths = []
         self.episode_times = []
         self.total_steps = 0
@@ -148,7 +148,7 @@ class SafeLogMonitor(Wrapper):
             raise RuntimeError("Tried to reset an environment before done. If you want to allow early resets, wrap your env with LogMonitor(env, path, allow_early_resets=True)")
         self.rewards = []
         self.costs = []
-        self.violations = []
+        # self.violations = []
         self.needs_reset = False
 
 
@@ -162,19 +162,19 @@ class SafeLogMonitor(Wrapper):
     def update(self, ob, rew, cost, done, info):
         self.rewards.append(rew)
         self.costs.append(cost)
-        self.violations.append(info['violation'])
+        # self.violations.append(info['violation'])
         if done:
             self.needs_reset = True
             eprew = sum(self.rewards)
             epcost = sum(self.costs)
-            epviolation = sum(self.violations)
+            # epviolation = sum(self.violations)
             eplen = len(self.rewards)
-            epinfo = {"r": round(eprew, 6), "c": round(epcost, 6), "violation":epviolation, "l": eplen, "t": round(time.time() - self.tstart, 6)}
+            epinfo = {"r": round(eprew, 6), "c": round(epcost, 6), "l": eplen, "t": round(time.time() - self.tstart, 6)}
             for k in self.info_keywords:
                 epinfo[k] = info[k]
             self.episode_rewards.append(eprew)
             self.episode_costs.append(epcost)
-            self.episode_violations.append(epviolation)
+            # self.episode_violations.append(epviolation)
             self.episode_lengths.append(eplen)
             self.episode_times.append(time.time() - self.tstart)
             epinfo.update(self.current_reset_info)
@@ -221,7 +221,7 @@ class ResultsWriter(object):
         if isinstance(header, dict):
             header = '# {} \n'.format(json.dumps(header))
         self.f.write(header)
-        self.logger = csv.DictWriter(self.f, fieldnames=('r', 'violation', 'l', 't')+tuple(extra_keys))
+        self.logger = csv.DictWriter(self.f, fieldnames=('r', 'l', 't')+tuple(extra_keys))
         self.logger.writeheader()
         self.f.flush()
 
@@ -244,7 +244,7 @@ class SafeResultsWriter(object):
         if isinstance(header, dict):
             header = '# {} \n'.format(json.dumps(header))
         self.f.write(header)
-        self.logger = csv.DictWriter(self.f, fieldnames=('r', 'c', 'violation', 'l', 't')+tuple(extra_keys))
+        self.logger = csv.DictWriter(self.f, fieldnames=('r', 'c', 'l', 't')+tuple(extra_keys))
         self.logger.writeheader()
         self.f.flush()
 

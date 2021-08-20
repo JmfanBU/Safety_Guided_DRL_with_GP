@@ -61,7 +61,7 @@ def make_vec_env(env_id, env_type, num_env, seed,
     if not force_dummy and num_env > 1:
         return SubprocVecEnv([make_thunk(i + start_index, initializer=initializer) for i in range(num_env)])
     else:
-        if env_type == 'mujocoGP':
+        if env_type == 'mujocoGP' or env_type == 'classic_control':
             return SafeDummyVecEnv([make_thunk(i + start_index, initializer=None) for i in range(num_env)])
         else:
             return DummyVecEnv([make_thunk(i + start_index, initializer=None) for i in range(num_env)])
@@ -102,14 +102,14 @@ def make_env(env_id, env_type, mpi_rank=0, subrank=0, seed=None, reward_scale=1.
                       allow_early_resets=True)
     else:
         if save_video_interval != 0:
-            env = SafetyGuided_DRL.envs.monitor.Monitor(env, logger.get_dir() and osp.join(logger.get_dir(), 'videos'), video_callable=lambda episode_id: episode_id%save_video_interval==0, force=True)
+            env = SafetyGuided_DRL.envs.monitor.SafeMonitor(env, logger.get_dir() and osp.join(logger.get_dir(), 'videos'), video_callable=lambda episode_id: episode_id%save_video_interval==0, force=True)
 
         if flatten_dict_observations and isinstance(env.observation_space, gym.spaces.Dict):
             keys = env.observation_space.spaces.keys()
             env = gym.wrappers.FlattenDictWrapper(env, dict_keys=list(keys))
 
         env.seed(seed + subrank if seed is not None else None)
-        env = Monitor(env,
+        env = SafeMonitor(env,
                       logger_dir and os.path.join(logger_dir, str(mpi_rank) + '.' + str(subrank)),
                       allow_early_resets=True)
 
