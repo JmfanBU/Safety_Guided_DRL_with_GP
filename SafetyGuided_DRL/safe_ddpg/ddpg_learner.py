@@ -574,8 +574,9 @@ class DDPG(object):
         q, r = np.linalg.qr(K)
         diag = np.absolute(np.diag(r))
         tol = 1e-5
-        self.min_sigular_value = np.amin(diag)
-        logger.info("Minimum singular value: {}".format(np.amin(diag)))
+        if diag.tolist():
+            self.min_sigular_value = np.amin(diag)
+            logger.info("Minimum singular value: {}".format(np.amin(diag)))
         if diag[diag > tol].shape[0] != cov_K.shape[0]:
             idx = np.where(diag <= tol)[0]
             logger.info("Eliminate {} instances due to sigularity.".format(idx.shape[0]))
